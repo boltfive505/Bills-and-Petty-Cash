@@ -1,0 +1,52 @@
+﻿<Page x:Class="Petty_Cash.Tab_Pages.bill_category_list_page"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:Petty_Cash.Tab_Pages"
+      mc:Ignorable="d" 
+      d:DesignHeight="450" d:DesignWidth="800"
+      Title="category_list_page" Loaded="Page_Loaded">
+    <Grid Background="White">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <!-- filters and other buttons -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal">
+            <!-- filters -->
+            <Grid x:Name="filtersGroup">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Top" Margin="0,0,50,0">
+                    <TextBlock Text="SEARCH:" Margin="0,0,5,0" VerticalAlignment="Center"/>
+                    <TextBox Width="200"/>
+                </StackPanel>
+            </Grid>
+            <!-- buttons -->
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Top">
+                <Button Content="Add Category" Click="AddCategory_btn_Click"
+                        Background="LightGreen"/>
+            </StackPanel>
+        </StackPanel>
+        <!-- category list -->
+        <DataGrid x:Name="categoryDg" Grid.Row="1">
+            <DataGrid.Columns>
+                <DataGridTemplateColumn>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button Style="{StaticResource BorderlessButton}" Click="EditCategory_btn_Click"
+                                    FontFamily="{StaticResource fontawesome-solid}" Content="{StaticResource fa-pen}"
+                                    Foreground="Navy" Margin="{StaticResource DataGridTextCell.Margin}" ToolTip="Edit category"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Header="Category Name" Binding="{Binding CategoryName}" Width="150">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Left}">
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <DataGridTextColumn Header="About Bill" Binding="{Binding Description,Converter={StaticResource HtmlToPlainTextConverter}}" ElementStyle="{StaticResource DataGridTextColumn.ElementStyle.Left}" Width="*"/>
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</Page>

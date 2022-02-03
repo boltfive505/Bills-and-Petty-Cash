@@ -1,0 +1,260 @@
+﻿<UserControl x:Class="Petty_Cash.Sub_Modals.billPeriod_preview"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Petty_Cash.Sub_Modals"
+             xmlns:system="clr-namespace:System;assembly=mscorlib"
+             xmlns:linq="clr-namespace:System.Linq;assembly=System.Core"
+             xmlns:me="clr-namespace:Petty_Cash"
+             xmlns:customs="clr-namespace:bolt5.CustomControls;assembly=bolt5.CustomControls.Wpf"
+             xmlns:xceed="clr-namespace:Xceed.Wpf.Toolkit;assembly=Xceed.Wpf.Toolkit"
+             xmlns:html="clr-namespace:bolt5.CustomHtmlCefEditor;assembly=bolt5.CustomHtmlCefEditor"
+             mc:Ignorable="d" Loaded="UserControl_Loaded">
+    <UserControl.Resources>
+        <Style x:Key="ReadOnlyTextbox" TargetType="{x:Type TextBox}">
+            <Setter Property="IsReadOnly" Value="True"/>
+            <Setter Property="IsHitTestVisible" Value="False"/>
+            <Setter Property="Background" Value="WhiteSmoke"/>
+        </Style>
+    </UserControl.Resources>
+    <Grid Background="White">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="auto"/>
+        </Grid.ColumnDefinitions>
+        <!-- bill period info -->
+        <StackPanel Orientation="Vertical">
+            <StackPanel Orientation="Horizontal" Margin="{StaticResource SubModal.Verticals.Margin}">
+                <StackPanel Orientation="Vertical" Margin="{StaticResource SubModal.Fields.Margin}">
+                    <TextBlock Text="Bill Name"/>
+                    <TextBox Text="{Binding BillerName,Mode=OneWay}" Style="{StaticResource ReadOnlyTextbox}" Width="200"/>
+                </StackPanel>
+                <StackPanel Orientation="Vertical" Margin="{StaticResource SubModal.Fields.Margin}">
+                    <TextBlock ToolTip="This description will also show on the Calendar.&#10;Please make it as short as possible." Width="200">
+                        <Run Text="Short Description "/>
+                        <Run FontFamily="{StaticResource fontawesome-solid}" Text="{StaticResource fa-info}" Foreground="Navy"/>
+                    </TextBlock>
+                    <TextBox Text="{Binding BillDescription,Mode=OneWay}" Style="{StaticResource ReadOnlyTextbox}" MaxLength="50"/>
+                </StackPanel>
+                <StackPanel Orientation="Vertical" Margin="{StaticResource SubModal.Fields.Margin}">
+                    <TextBlock Text="Category"/>
+                    <TextBox Text="{Binding Category.CategoryName}" Style="{StaticResource ReadOnlyTextbox}" Width="160"/>
+                </StackPanel>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="{StaticResource SubModal.Verticals.Margin}">
+                <StackPanel Orientation="Vertical" Margin="{StaticResource SubModal.Fields.Margin}">
+                    <TextBlock Text="Account Name"/>
+                    <TextBox Text="{Binding AccountName,Mode=OneWay}" Style="{StaticResource ReadOnlyTextbox}" Width="200"/>
+                </StackPanel>
+                <StackPanel Orientation="Vertical" Margin="{StaticResource SubModal.Fields.Margin}">
+                    <TextBlock Text="Account Number"/>
+                    <TextBox Text="{Binding AccountNumber,Mode=OneWay}" Style="{StaticResource ReadOnlyTextbox}" Width="150"/>
+                </StackPanel>
+                <StackPanel Orientation="Vertical" Margin="{StaticResource SubModal.Fields.Margin}">
+                    <TextBlock Text="Contract Amount"/>
+                    <TextBox Text="{Binding ContractAmount, StringFormat={}{0:00}}" Style="{StaticResource ReadOnlyTextbox}" TextAlignment="Right"/>
+                </StackPanel>
+                <StackPanel Orientation="Vertical" Margin="{StaticResource SubModal.Fields.Margin}">
+                    <TextBlock Text="Contract Expiration"/>
+                    <TextBox Text="{Binding ContractExpiration, StringFormat={}{0:MM/dd/yyyy}}" Style="{StaticResource ReadOnlyTextbox}" TextAlignment="Right"/>
+                </StackPanel>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="{StaticResource SubModal.Verticals.Margin}">
+                <StackPanel Orientation="Vertical" Margin="{StaticResource SubModal.Fields.Margin}">
+                    <TextBlock Text="Tin No."/>
+                    <TextBox Text="{Binding TinNumber,Mode=OneWay}" Style="{StaticResource ReadOnlyTextbox}" Width="200"/>
+                </StackPanel>
+                <StackPanel Orientation="Vertical" Margin="{StaticResource SubModal.Fields.Margin}">
+                    <TextBlock Text="VAT"/>
+                    <TextBox Width="40" TextAlignment="Right">
+                        <TextBox.Style>
+                            <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource ReadOnlyTextbox}">
+                                <Setter Property="Text" Value="{x:Null}"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding TaxType}" Value="{x:Static me:BillTaxType.Vat}">
+                                        <Setter Property="Text" Value="{Binding TaxRate,Mode=OneWay,Converter={StaticResource PercentDisplayConverter}}"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBox.Style>
+                    </TextBox>
+                </StackPanel>
+                <StackPanel Orientation="Vertical" Margin="{StaticResource SubModal.Fields.Margin}">
+                    <TextBlock Text="WHT"/>
+                    <TextBox Width="40" TextAlignment="Right">
+                        <TextBox.Style>
+                            <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource ReadOnlyTextbox}">
+                                <Setter Property="Text" Value="{x:Null}"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding TaxType}" Value="{x:Static me:BillTaxType.Withholding_Tax}">
+                                        <Setter Property="Text" Value="{Binding TaxRate,Mode=OneWay,Converter={StaticResource PercentDisplayConverter}}"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBox.Style>
+                    </TextBox>
+                </StackPanel>
+                <Grid>
+                    <StackPanel Orientation="Vertical" Margin="{StaticResource SubModal.Fields.Margin}">
+                        <TextBlock Text="Contract File"/>
+                        <Button Click="OpenContractFile_Click" Tag="{Binding ContractFile}" ToolTip="{Binding ContractFile}" FontFamily="{StaticResource fontawesome-solid}" FontSize="15" Content="{StaticResource fa-file}" HorizontalAlignment="Left">
+                            <Button.Style>
+                                <Style TargetType="{x:Type Button}" BasedOn="{StaticResource BorderlessButton}">
+                                    <Setter Property="Foreground" Value="#f4c43b"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding ContractFile}" Value="">
+                                            <Setter Property="Foreground" Value="Gray"/>
+                                            <Setter Property="IsEnabled" Value="False"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding ContractFile}" Value="{x:Null}">
+                                            <Setter Property="Foreground" Value="Gray"/>
+                                            <Setter Property="IsEnabled" Value="False"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                    </StackPanel>
+                </Grid>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="{StaticResource SubModal.Verticals.Margin}">
+                <StackPanel Orientation="Vertical" Margin="{StaticResource SubModal.Fields.Margin}">
+                    <TextBlock Text="Address"/>
+                    <TextBox Text="{Binding Address,Mode=OneWay}" Style="{StaticResource ReadOnlyTextbox}" Width="400"/>
+                </StackPanel>
+                <StackPanel Orientation="Vertical" Margin="{StaticResource SubModal.Fields.Margin}">
+                    <TextBlock Text="Unit Number"/>
+                    <TextBox Text="{Binding UnitNumber,Mode=OneWay}" Style="{StaticResource ReadOnlyTextbox}" Width="100"/>
+                </StackPanel>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="{StaticResource SubModal.Verticals.Margin}">
+                <StackPanel Orientation="Vertical" Margin="{StaticResource SubModal.Fields.Margin}">
+                    <TextBlock Text="Phone Number"/>
+                    <TextBox Text="{Binding PhoneNumber,Mode=OneWay}" Style="{StaticResource ReadOnlyTextbox}" Width="150"/>
+                </StackPanel>
+                <StackPanel Orientation="Vertical" Margin="{StaticResource SubModal.Fields.Margin}">
+                    <TextBlock Text="Contact Person"/>
+                    <TextBox Text="{Binding ContactPerson,Mode=OneWay}" Style="{StaticResource ReadOnlyTextbox}" Width="200"/>
+                </StackPanel>
+                <StackPanel Orientation="Vertical" Margin="{StaticResource SubModal.Fields.Margin}">
+                    <TextBlock Text="Contact Number"/>
+                    <TextBox Text="{Binding ContactNumber,Mode=OneWay}" Style="{StaticResource ReadOnlyTextbox}" Width="150"/>
+                </StackPanel>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="{StaticResource SubModal.Verticals.Margin}">
+                <StackPanel Orientation="Vertical" Margin="{StaticResource SubModal.Fields.Margin}">
+                    <TextBlock Text="Reference Link"/>
+                    <TextBox Text="{Binding ReferenceLink,Mode=OneWay}" Style="{StaticResource ReadOnlyTextbox}" Width="250"/>
+                </StackPanel>
+                <StackPanel Orientation="Vertical" Margin="{StaticResource SubModal.Fields.Margin}">
+                    <TextBlock Text="Username"/>
+                    <TextBox Text="{Binding Username,Mode=OneTime}" Style="{StaticResource ReadOnlyTextbox}" Width="180"/>
+                </StackPanel>
+                <StackPanel Orientation="Vertical" Margin="{StaticResource SubModal.Fields.Margin}">
+                    <TextBlock Text="Password"/>
+                    <TextBox Text="{Binding Password,Mode=OneWay}" Style="{StaticResource ReadOnlyTextbox}" Width="180"/>
+                </StackPanel>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="{StaticResource SubModal.Verticals.Margin}">
+                <StackPanel Orientation="Vertical" Margin="{StaticResource SubModal.Fields.Margin}">
+                    <TextBlock ToolTip="This description will show when you put your cursor on the name.&#10;Please make it as detailed as possible.">
+                        <Run Text="Hover Text (Long Description)"/>
+                        <Run FontFamily="{StaticResource fontawesome-solid}" Text="{StaticResource fa-info}" Foreground="Navy"/>
+                    </TextBlock>
+                    <TextBox Text="{Binding Description,Mode=OneWay}" Style="{StaticResource ReadOnlyTextbox}"
+                             TextWrapping="Wrap" Height="50" Width="640"/>
+                </StackPanel>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="{StaticResource SubModal.Verticals.Margin}">
+                <StackPanel Orientation="Vertical" Margin="{StaticResource SubModal.Fields.Margin}">
+                    <TextBlock Text="Bill Instruction"/>
+                    <html:HtmlPreview HtmlContent="{Binding BillInstructions}" Height="200" Width="550"/>
+                </StackPanel>
+            </StackPanel>
+        </StackPanel>
+        
+        <!-- bill period payment history -->
+        <GroupBox Grid.Column="1" HorizontalAlignment="Left" Margin="5,0,5,0">
+            <GroupBox.Header>
+                <TextBlock Text="Payment History" FontWeight="Bold"/>
+            </GroupBox.Header>
+            <DataGrid x:Name="payemntHistoryDataGrid" Margin="3">
+                <DataGrid.CellStyle>
+                    <Style TargetType="{x:Type DataGridCell}" BasedOn="{StaticResource DataGridCell.Style.Default}">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Amount}" Value="0">
+                                <Setter Property="Foreground" Value="Red"/>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding ReceiptFileName}" Value="">
+                                <Setter Property="Foreground" Value="Red"/>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding ReceiptFileName}" Value="{x:Null}">
+                                <Setter Property="Foreground" Value="Red"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </DataGrid.CellStyle>
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Due Date" Binding="{Binding PeriodDate, StringFormat=yyyy-MM-dd}" HeaderStyle="{StaticResource DataGridColumnHeader.Right}" ElementStyle="{StaticResource DataGridTextColumn.ElementStyle.Right}"/>
+                    <DataGridTextColumn Header="Billing Period" HeaderStyle="{StaticResource DataGridColumnHeader.Right}" ElementStyle="{StaticResource DataGridTextColumn.ElementStyle.Left}">
+                        <DataGridTextColumn.Binding>
+                            <MultiBinding StringFormat="{}{0:MM/dd/yyyy} - {1:MM/dd/yyyy}">
+                                <Binding Path="PeriodFrom"/>
+                                <Binding Path="PeriodTo"/>
+                            </MultiBinding>
+                        </DataGridTextColumn.Binding>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="Payment Date" Binding="{Binding PaymentDate, StringFormat=yyyy-MM-dd}" HeaderStyle="{StaticResource DataGridColumnHeader.Right}" ElementStyle="{StaticResource DataGridTextColumn.ElementStyle.Right}" Width="100"/>
+                    <DataGridTextColumn Header="Bill Amount" Binding="{Binding BillAmount,Converter={StaticResource DisplayNoCurrency}}" Width="90" HeaderStyle="{StaticResource DataGridColumnHeader.Right}">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Right}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding BillFileName, Converter={StaticResource ObjectToBoolConverter}}" Value="False">
+                                        <Setter Property="Foreground" Value="#003a96"/>
+                                        <Setter Property="FontWeight" Value="Bold"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <DataGridTemplateColumn Header="Bill" HeaderStyle="{StaticResource DataGridColumnHeader.Center}">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button Style="{StaticResource BorderlessButton}" FontFamily="{StaticResource fontawesome-solid}" Content="{StaticResource fa-file}" Foreground="#f4c43b"
+                                    Click="OpenBillFile_btn_Click"
+                                    ToolTip="{Binding BillFileName}" Tag="{Binding BillFileName}"
+                                    Margin="{StaticResource DataGridTextCell.Margin}"
+                                    Visibility="{Binding BillFileName, Converter={StaticResource VisibilityValueConverter}}"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTextColumn Header="Paid Amount" Binding="{Binding Amount,Converter={StaticResource DisplayNoCurrency}}" Width="90" HeaderStyle="{StaticResource DataGridColumnHeader.Right}">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Right}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ReceiptFileName, Converter={StaticResource ObjectToBoolConverter}}" Value="False">
+                                        <Setter Property="Foreground" Value="#f27900"/>
+                                        <Setter Property="FontWeight" Value="Bold"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <DataGridTemplateColumn Header="Receipt" HeaderStyle="{StaticResource DataGridColumnHeader.Center}">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button Style="{StaticResource BorderlessButton}" FontFamily="{StaticResource fontawesome-solid}" Content="{StaticResource fa-file}" Foreground="#4b90c5"
+                                    Click="OpenFile_btn_Click"
+                                    ToolTip="{Binding ReceiptFileName}" Tag="{Binding ReceiptFileName}"
+                                    Margin="{StaticResource DataGridTextCell.Margin}"
+                                    Visibility="{Binding ReceiptFileName, Converter={StaticResource VisibilityValueConverter}}"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTextColumn Header="Pay Type" Binding="{Binding PaymentType}" ElementStyle="{StaticResource DataGridTextColumn.ElementStyle.Left}" Width="110"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </GroupBox>
+    </Grid>
+</UserControl>

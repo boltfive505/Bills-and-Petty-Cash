@@ -1,0 +1,147 @@
+﻿<Page x:Class="Petty_Cash.Tab_Pages.check_writer_page"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:Petty_Cash.Tab_Pages"
+      mc:Ignorable="d" 
+      d:DesignHeight="450" d:DesignWidth="800"
+      Title="check_writer_page" Loaded="Page_Loaded">
+    <Page.Resources>
+        <DataTemplate x:Key="BankTemplate">
+            <Grid Margin="{StaticResource DataGridTextCell.Margin}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Expander Style="{StaticResource PlusMinusExpander}"
+                          IsEnabled="{Binding HasChildren}"
+                          IsExpanded="{Binding IsExpanded,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" 
+                          HorizontalAlignment="Left"/>
+                <TextBlock Grid.Column="1">
+                    <Run Text="{Binding Bank.BankName}"/>
+                    -
+                    <Run Text="{Binding Bank.Branch}" Foreground="Gray" FontStyle="Italic"/>
+                </TextBlock>
+            </Grid>
+        </DataTemplate>
+        <DataTemplate x:Key="AccountTemplate">
+            <Grid Margin="{StaticResource DataGridTextCell.Margin}">
+                <TextBlock Margin="40,0,0,0">
+                    <Run Text="{Binding Account.AccountNumber}" Foreground="Gray"/>
+                    <Run Text="{Binding Account.AccountName,StringFormat={}- {0}}"/>
+                    <Run Text="{Binding Account.Purpose,StringFormat={}- {0}}" FontWeight="Bold" Foreground="DarkGreen"/>
+                </TextBlock>
+                <Grid.ToolTip>
+                    <TextBlock>
+                        <Run Text="{Binding Account.AccountNumber}" Foreground="Gray"/>
+                    <Run Text="{Binding Account.AccountName,StringFormat={}- {0}}"/>
+                    <Run Text="{Binding Account.Purpose,StringFormat={}- {0}}" FontWeight="Bold" Foreground="DarkGreen"/>
+                    </TextBlock>
+                </Grid.ToolTip>
+            </Grid>
+        </DataTemplate>
+        <DataTemplate x:Key="BankButtonsTemplate">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+            </StackPanel>
+        </DataTemplate>
+        <DataTemplate x:Key="AccountButtonsTemplate">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Style="{StaticResource BorderlessButton}" FontFamily="{StaticResource fontawesome-solid}" Content="{StaticResource fa-plus}" Foreground="DarkGreen" Click="WriteCheck_Click" ToolTip="Add Check" Margin="3,0,3,0"/>
+            </StackPanel>
+        </DataTemplate>
+        <local:BankAccountTemplateSelector x:Key="BankAccountTemplateSelector" BankTemplate="{StaticResource BankTemplate}" AccountTemplate="{StaticResource AccountTemplate}"/>
+        <local:BankAccountTemplateSelector x:Key="BankAccountButtonsTemplateSelector" BankTemplate="{StaticResource BankButtonsTemplate}" AccountTemplate="{StaticResource AccountButtonsTemplate}"/>
+    </Page.Resources>
+    <Grid Background="White">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="80"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="470"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <!-- buttons -->
+        <Button Content="Reset Selection" Click="ResetCompanySelection_Click" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="0,0,0,3"/>
+        <!-- bank and account list -->
+        <GroupBox Grid.Column="0" Grid.Row="1" Grid.RowSpan="2">
+            <GroupBox.Header>
+                <TextBlock Text="BANK AND ACCOUNT LIST" FontWeight="Bold"/>
+            </GroupBox.Header>
+            <DataGrid x:Name="banks_accounts_DataGrid" HeadersVisibility="None" CanUserSortColumns="False" GridLinesVisibility="Horizontal" Margin="0,3,0,0"
+                      SelectedValue="{Binding RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type local:check_writer_page}},Path=Selections.SelectedBankAccountPair,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}">
+                <DataGrid.RowStyle>
+                    <Style TargetType="{x:Type DataGridRow}" BasedOn="{StaticResource DataGridRow.Style.Default}">
+                        <Setter Property="Visibility" Value="Visible"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsVisible}" Value="False">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </DataGrid.RowStyle>
+                <DataGrid.Columns>
+                    <DataGridTemplateColumn CellTemplateSelector="{StaticResource BankAccountTemplateSelector}" Width="*"/>
+                    <DataGridTemplateColumn Header="Edit" Width="40" CellStyle="{StaticResource DataGridCell.Style.ShowOnHover}" CellTemplateSelector="{StaticResource BankAccountButtonsTemplateSelector}"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </GroupBox>
+        <!-- check list -->
+        <GroupBox Grid.Column="1" Grid.Row="1" Margin="10,0,0,0">
+            <GroupBox.Header>
+                <TextBlock FontWeight="Bold">Check List</TextBlock>
+            </GroupBox.Header>
+            <DataGrid x:Name="checkDataGrid" HeadersVisibility="Column" Margin="0,3,0,0">
+                <DataGrid.Columns>
+                    <DataGridTemplateColumn CellStyle="{StaticResource DataGridCell.Style.ShowOnHover}" CanUserResize="False">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button Style="{StaticResource BorderlessButton}" FontFamily="{StaticResource fontawesome-solid}" Content="{StaticResource fa-edit}" Foreground="Navy" Click="WriteCheck_Click" ToolTip="Edit Check" Margin="2,0,2,0"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn CellStyle="{StaticResource DataGridCell.Style.ShowOnHover}" CanUserResize="False">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button Style="{StaticResource BorderlessButton}" FontFamily="{StaticResource fontawesome-solid}" Content="{StaticResource fa-print}" Click="PrintCheck_Click" ToolTip="Print Check" Margin="2,0,2,0"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTextColumn Header="#" Binding="{Binding Id}" HeaderStyle="{StaticResource DataGridColumnHeader.Center}" ElementStyle="{StaticResource DataGridTextColumn.ElementStyle.Center}" Foreground="Gray"/>
+                    <DataGridCheckBoxColumn Header="Used" Binding="{Binding AlreadyUsed}" HeaderStyle="{StaticResource DataGridColumnHeader.Center}" ElementStyle="{StaticResource DataGridCheckBoxColumn.ElementStyle}"/>
+                    <DataGridTextColumn Header="Vch #" Binding="{Binding Voucher.Id}" ElementStyle="{StaticResource DataGridTextColumn.ElementStyle.Left}"/>
+                    <DataGridTextColumn Header="Pay to Bill" Binding="{Binding PayToBillName}" Width="200">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Left}">
+                                <Setter Property="ToolTip" Value="{Binding PayToBillName}"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="Bank Name" Binding="{Binding Account.Bank.BankName}" ElementStyle="{StaticResource DataGridTextColumn.ElementStyle.Left}" Width="90"/>
+                    <DataGridTextColumn Header="Account Name" Binding="{Binding Account.AccountName}" ElementStyle="{StaticResource DataGridTextColumn.ElementStyle.Left}" Width="90"/>
+                    <DataGridTextColumn Header="Account #" Binding="{Binding Account.AccountNumber}" ElementStyle="{StaticResource DataGridTextColumn.ElementStyle.Left}" Width="90"/>
+                    <DataGridTextColumn Header="Check #" Binding="{Binding CheckNumber}" ElementStyle="{StaticResource DataGridTextColumn.ElementStyle.Left}"/>
+                    <DataGridTextColumn Header="Payee" Binding="{Binding PayeeName}" Width="130">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Left}">
+                                <Setter Property="ToolTip" Value="{Binding PayeeName}"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="Amount" Binding="{Binding Amount, Converter={StaticResource DisplayNoCurrency}}" HeaderStyle="{StaticResource DataGridColumnHeader.Right}" ElementStyle="{StaticResource DataGridTextColumn.ElementStyle.Right}" Width="70"/>
+                    <DataGridTextColumn Header="Check Date" Binding="{Binding CheckDate,StringFormat=MM/dd/yyyy}" HeaderStyle="{StaticResource DataGridColumnHeader.Right}" ElementStyle="{StaticResource DataGridTextColumn.ElementStyle.Right}"/>
+                    <DataGridTextColumn Header="Notes" Binding="{Binding Description}" Width="100">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Left}">
+                                <Setter Property="ToolTip" Value="{Binding Description}"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="Created" Binding="{Binding UpdatedDate,StringFormat=MM/dd/yyyy}" HeaderStyle="{StaticResource DataGridColumnHeader.Right}" ElementStyle="{StaticResource DataGridTextColumn.ElementStyle.Right}" Foreground="Gray"/>
+                    <DataGridTextColumn Header="Printed" Binding="{Binding PrintedDate,StringFormat=MM/dd/yyyy}" HeaderStyle="{StaticResource DataGridColumnHeader.Right}" ElementStyle="{StaticResource DataGridTextColumn.ElementStyle.Right}" Foreground="Gray"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </GroupBox>
+    </Grid>
+</Page>

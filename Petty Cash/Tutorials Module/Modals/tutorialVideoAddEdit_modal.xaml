@@ -1,0 +1,175 @@
+﻿<UserControl x:Class="Petty_Cash.Tutorials_Module.Modals.tutorialVideoAddEdit_modal"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Petty_Cash.Tutorials_Module.Modals"
+             xmlns:converters="clr-namespace:Petty_Cash.Converters"
+             xmlns:customs="clr-namespace:bolt5.CustomControls;assembly=bolt5.CustomControls.Wpf"
+             xmlns:html="clr-namespace:bolt5.CustomHtmlCefEditor;assembly=bolt5.CustomHtmlCefEditor"
+             xmlns:system="clr-namespace:System;assembly=mscorlib"
+             xmlns:linq="clr-namespace:System.Linq;assembly=System.Core"
+             xmlns:tutorials="clr-namespace:Petty_Cash.Tutorials_Module"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <converters:HierarchyMarginConverter x:Key="HierarchyMarginConverter" Multiplier="12"/>
+        <ObjectDataProvider x:Key="EntryLevelData" MethodName="GetValues" ObjectType="{x:Type system:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type Type="{x:Type tutorials:EntryLevel}"/>
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+        <ObjectDataProvider x:Key="PeriodTypeData" MethodName="GetValues" ObjectType="{x:Type system:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type Type="{x:Type tutorials:TutorialPeriodType}"/>
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+        <ObjectDataProvider x:Key="DaysInWeek" MethodName="Range" ObjectType="{x:Type linq:Enumerable}">
+            <ObjectDataProvider.MethodParameters>
+                <system:Int32>1</system:Int32>
+                <system:Int32>7</system:Int32>
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+        <ObjectDataProvider x:Key="DaysInMonth" MethodName="Range" ObjectType="{x:Type linq:Enumerable}">
+            <ObjectDataProvider.MethodParameters>
+                <system:Int32>1</system:Int32>
+                <system:Int32>31</system:Int32>
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+    </UserControl.Resources>
+    <Grid Background="White">
+        <StackPanel Orientation="Vertical" Margin="{StaticResource SubModal.Group.Margin}">
+            <StackPanel Orientation="Horizontal" Margin="{StaticResource SubModal.Verticals.Margin}">
+                <StackPanel Orientation="Vertical" Margin="{StaticResource SubModal.Fields.Margin}" Width="200">
+                    <TextBlock Text="Category"/>
+                    <ComboBox x:Name="categoryCbox" SelectedItem="{Binding Category,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding CategoryName, StringFormat={}- {0}}"
+                                           Margin="{Binding HierarchyLevel, Converter={StaticResource HierarchyMarginConverter}}"/>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                </StackPanel>
+                <StackPanel Orientation="Vertical" Margin="{StaticResource SubModal.Fields.Margin}" Width="120">
+                    <TextBlock Text="Level"/>
+                    <ComboBox ItemsSource="{Binding Source={StaticResource EntryLevelData}}"
+                        SelectedItem="{Binding EntryLevel,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                </StackPanel>
+            </StackPanel>
+            <Grid Margin="{StaticResource SubModal.Verticals.Margin}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0" Orientation="Vertical" HorizontalAlignment="Left">
+                    <StackPanel Orientation="Vertical" Margin="{StaticResource SubModal.Fields.Margin}" Width="300">
+                        <TextBlock Text="Final Video"/>
+                        <customs:FileAttachment CanRemoveFile="True" FileName="{Binding VideoFile,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Filter="{x:Static tutorials:TutorialsHelper.VideoFilters}"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Vertical" Margin="{StaticResource SubModal.Fields.Margin}" Width="300">
+                        <TextBlock Text="Thumbnail Image"/>
+                        <customs:FileAttachment CanRemoveFile="True" FileName="{Binding ThumbnailFile,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Filter="{x:Static tutorials:TutorialsHelper.ThumbnailFilters}"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Vertical" Margin="{StaticResource SubModal.Fields.Margin}" Width="300">
+                        <TextBlock Text="File Attachment"/>
+                        <customs:FileAttachment CanRemoveFile="True" FileName="{Binding FileAttachment,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Vertical" Margin="{StaticResource SubModal.Fields.Margin}" Width="300">
+                        <TextBlock Text="Youtube Link URL"/>
+                        <TextBox Text="{Binding YoutubeUrlLink,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                    </StackPanel>
+                </StackPanel>
+                <StackPanel Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Left">
+                    <StackPanel Orientation="Vertical" Margin="{StaticResource SubModal.Fields.Margin}" Width="300">
+                        <TextBlock Text="Raw Video #1"/>
+                        <customs:FileAttachment CanRemoveFile="True" FileName="{Binding RawVideoFile1,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Filter="{x:Static tutorials:TutorialsHelper.VideoFilters}"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Vertical" Margin="{StaticResource SubModal.Fields.Margin}" Width="300">
+                        <TextBlock Text="Raw Video #2"/>
+                        <customs:FileAttachment CanRemoveFile="True" FileName="{Binding RawVideoFile2,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Filter="{x:Static tutorials:TutorialsHelper.VideoFilters}"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Vertical" Margin="{StaticResource SubModal.Fields.Margin}" Width="300">
+                        <TextBlock Text="Raw Video #3"/>
+                        <customs:FileAttachment CanRemoveFile="True" FileName="{Binding RawVideoFile3,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Filter="{x:Static tutorials:TutorialsHelper.VideoFilters}"/>
+                    </StackPanel>
+                </StackPanel>
+            </Grid>
+            <StackPanel Orientation="Horizontal" Margin="{StaticResource SubModal.Verticals.Margin}">
+                <StackPanel Orientation="Vertical" Margin="{StaticResource SubModal.Fields.Margin}" Width="700">
+                    <TextBlock Text="Short Description"/>
+                    <html:HtmlEditor HtmlContent="{Binding ShortDescription,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Height="120"/>
+                </StackPanel>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="{StaticResource SubModal.Verticals.Margin}">
+                <StackPanel Orientation="Vertical" Margin="{StaticResource SubModal.Fields.Margin}" Width="700">
+                    <TextBlock Text="Long Description"/>
+                    <html:HtmlEditor HtmlContent="{Binding LongDescription,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Height="200"/>
+                </StackPanel>
+            </StackPanel>
+            <GroupBox Header="ASSIGN JOB SCHEDULE" Margin="{StaticResource SubModal.Fields.Margin}">
+                <StackPanel Orientation="Horizontal" Margin="{StaticResource SubModal.Verticals.Margin}">
+                    <StackPanel Orientation="Vertical" Margin="{StaticResource SubModal.Fields.Margin}" VerticalAlignment="Center">
+                        <CheckBox Content="Not Applicable" Style="{StaticResource RightCheckBox}" IsChecked="{Binding IsPeriodNotApplicable,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="{StaticResource SubModal.Fields.Margin}">
+                        <TextBlock Text="Scheduled" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                        <ComboBox x:Name="PeriodTypeCbox" ItemsSource="{Binding Source={StaticResource PeriodTypeData}}"
+                        SelectedItem="{Binding PeriodType,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Width="90"/>
+                    </StackPanel>
+                    <!-- monthly -->
+                    <StackPanel Orientation="Horizontal" Margin="{StaticResource SubModal.Fields.Margin}">
+                        <StackPanel.Style>
+                            <Style TargetType="{x:Type StackPanel}">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ElementName=PeriodTypeCbox, Path=SelectedItem}" Value="{x:Static tutorials:TutorialPeriodType.Monthly}">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </StackPanel.Style>
+                        <TextBlock Text="Day" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                        <ComboBox ItemsSource="{Binding Source={StaticResource DaysInMonth}}" SelectedItem="{Binding PeriodDay,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Width="50">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding StringFormat={}{0:00}}"/>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                    </StackPanel>
+                    <!-- weekly -->
+                    <StackPanel Orientation="Horizontal" Margin="{StaticResource SubModal.Fields.Margin}">
+                        <StackPanel.Style>
+                            <Style TargetType="{x:Type StackPanel}">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ElementName=PeriodTypeCbox, Path=SelectedItem}" Value="{x:Static tutorials:TutorialPeriodType.Weekly}">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </StackPanel.Style>
+                        <TextBlock Text="Day" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                        <ComboBox ItemsSource="{Binding Source={StaticResource DaysInWeek}}" SelectedItem="{Binding PeriodDay,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Width="50">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding StringFormat={}{0:00}}"/>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="{StaticResource SubModal.Fields.Margin}">
+                        <TextBlock Text="Schedule Name" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                        <TextBox Text="{Binding PeriodName,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Width="200"/>
+                    </StackPanel>
+                </StackPanel>
+            </GroupBox>
+            <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                <Button Content="DELETE" Click="Delete_btn_Click"
+                        Foreground="Red" BorderBrush="Red"
+                        Margin="{StaticResource SubModal.Fields.Margin}"/>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</UserControl>

@@ -1,0 +1,100 @@
+﻿<UserControl x:Class="Petty_Cash.Sub_Modals.billPeriod_history_preview"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Petty_Cash.Sub_Modals"
+             xmlns:system="clr-namespace:System;assembly=mscorlib"
+             xmlns:linq="clr-namespace:System.Linq;assembly=System.Core"
+             xmlns:me="clr-namespace:Petty_Cash"
+             xmlns:customs="clr-namespace:bolt5.CustomControls;assembly=bolt5.CustomControls.Wpf"
+             xmlns:xceed="clr-namespace:Xceed.Wpf.Toolkit;assembly=Xceed.Wpf.Toolkit"
+             xmlns:html="clr-namespace:bolt5.CustomHtmlCefEditor;assembly=bolt5.CustomHtmlCefEditor"
+             mc:Ignorable="d" Loaded="UserControl_Loaded">
+    <UserControl.Resources>
+        <Style x:Key="ReadOnlyTextbox" TargetType="{x:Type TextBox}">
+            <Setter Property="IsReadOnly" Value="True"/>
+            <Setter Property="IsHitTestVisible" Value="False"/>
+            <Setter Property="Background" Value="WhiteSmoke"/>
+        </Style>
+    </UserControl.Resources>
+    <Grid Background="White" Height="500">
+        <!-- bill period payment history -->
+            <DataGrid x:Name="payemntHistoryDataGrid" Margin="{StaticResource SubModal.Fields.Margin}">
+            <DataGrid.CellStyle>
+                <Style TargetType="{x:Type DataGridCell}" BasedOn="{StaticResource DataGridCell.Style.Default}">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Amount}" Value="0">
+                            <Setter Property="Foreground" Value="Red"/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding ReceiptFileName}" Value="">
+                            <Setter Property="Foreground" Value="Red"/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding ReceiptFileName}" Value="{x:Null}">
+                            <Setter Property="Foreground" Value="Red"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </DataGrid.CellStyle>
+            <DataGrid.Columns>
+                    <DataGridTextColumn Header="Due Date" Binding="{Binding PeriodDate, StringFormat=yyyy-MM-dd}" HeaderStyle="{StaticResource DataGridColumnHeader.Right}" ElementStyle="{StaticResource DataGridTextColumn.ElementStyle.Right}"/>
+                    <DataGridTextColumn Header="Billing Period" HeaderStyle="{StaticResource DataGridColumnHeader.Right}" ElementStyle="{StaticResource DataGridTextColumn.ElementStyle.Left}">
+                        <DataGridTextColumn.Binding>
+                            <MultiBinding StringFormat="{}{0:MM/dd/yyyy} - {1:MM/dd/yyyy}">
+                                <Binding Path="PeriodFrom"/>
+                                <Binding Path="PeriodTo"/>
+                            </MultiBinding>
+                        </DataGridTextColumn.Binding>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="Payment Date" Binding="{Binding PaymentDate, StringFormat=yyyy-MM-dd}" HeaderStyle="{StaticResource DataGridColumnHeader.Right}" ElementStyle="{StaticResource DataGridTextColumn.ElementStyle.Right}" Width="100"/>
+                    <DataGridTextColumn Header="Bill Amount" Binding="{Binding BillAmount,Converter={StaticResource DisplayNoCurrency}}" Width="90" HeaderStyle="{StaticResource DataGridColumnHeader.Right}">
+                        <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Right}">
+                            <Style.Triggers>
+                                    <DataTrigger Binding="{Binding BillFileName, Converter={StaticResource ObjectToBoolConverter}}" Value="False">
+                                        <Setter Property="Foreground" Value="#003a96"/>
+                                        <Setter Property="FontWeight" Value="Bold"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <DataGridTemplateColumn Header="Bill" HeaderStyle="{StaticResource DataGridColumnHeader.Center}">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button Style="{StaticResource BorderlessButton}" FontFamily="{StaticResource fontawesome-solid}" Content="{StaticResource fa-file}" Foreground="#f4c43b"
+                                    Click="OpenFile_btn_Click"
+                                    ToolTip="{Binding BillFileName}" Tag="{Binding BillFileName}"
+                                    Margin="{StaticResource DataGridTextCell.Margin}"
+                                    Visibility="{Binding BillFileName, Converter={StaticResource VisibilityValueConverter}}"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTextColumn Header="Paid Amount" Binding="{Binding Amount,Converter={StaticResource DisplayNoCurrency}}" Width="90" HeaderStyle="{StaticResource DataGridColumnHeader.Right}">
+                        <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Right}">
+                            <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ReceiptFileName, Converter={StaticResource ObjectToBoolConverter}}" Value="False">
+                                        <Setter Property="Foreground" Value="#f27900"/>
+                                        <Setter Property="FontWeight" Value="Bold"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <DataGridTemplateColumn Header="Receipt" HeaderStyle="{StaticResource DataGridColumnHeader.Center}">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button Style="{StaticResource BorderlessButton}" FontFamily="{StaticResource fontawesome-solid}" Content="{StaticResource fa-file}" Foreground="#4b90c5"
+                                    Click="OpenFile_btn_Click"
+                                    ToolTip="{Binding ReceiptFileName}" Tag="{Binding ReceiptFileName}"
+                                    Margin="{StaticResource DataGridTextCell.Margin}"
+                                    Visibility="{Binding ReceiptFileName, Converter={StaticResource VisibilityValueConverter}}"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTextColumn Header="Pay Type" Binding="{Binding PaymentType}" ElementStyle="{StaticResource DataGridTextColumn.ElementStyle.Left}" Width="110"/>
+                </DataGrid.Columns>
+            </DataGrid>
+    </Grid>
+</UserControl>

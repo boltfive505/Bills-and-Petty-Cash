@@ -1,0 +1,702 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\CefSharp.Common.90.6.70\build\CefSharp.Common.props" Condition="Exists('..\packages\CefSharp.Common.90.6.70\build\CefSharp.Common.props')" />
+  <Import Project="..\packages\cef.redist.x86.90.6.7\build\cef.redist.x86.props" Condition="Exists('..\packages\cef.redist.x86.90.6.7\build\cef.redist.x86.props')" />
+  <Import Project="..\packages\cef.redist.x64.90.6.7\build\cef.redist.x64.props" Condition="Exists('..\packages\cef.redist.x64.90.6.7\build\cef.redist.x64.props')" />
+  <Import Project="..\packages\EntityFramework.6.4.4\build\EntityFramework.props" Condition="Exists('..\packages\EntityFramework.6.4.4\build\EntityFramework.props')" />
+  <Import Project="..\packages\PropertyChanged.Fody.3.3.3\build\PropertyChanged.Fody.props" Condition="Exists('..\packages\PropertyChanged.Fody.3.3.3\build\PropertyChanged.Fody.props')" />
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{4E4ABD76-24FD-4DC6-8A7E-988FBE09AF98}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>Petty_Cash</RootNamespace>
+    <AssemblyName>Bills and Cash</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <WarningLevel>4</WarningLevel>
+    <Deterministic>true</Deterministic>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>petty cash.ico</ApplicationIcon>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="AForge, Version=2.2.5.0, Culture=neutral, PublicKeyToken=c1db6ff4eaa06aeb, processorArchitecture=MSIL">
+      <HintPath>..\packages\AForge.2.2.5\lib\AForge.dll</HintPath>
+    </Reference>
+    <Reference Include="AForge.Controls, Version=2.2.5.0, Culture=neutral, PublicKeyToken=a8ac264d1dc6b9d9, processorArchitecture=MSIL">
+      <HintPath>..\packages\AForge.Controls.2.2.5\lib\AForge.Controls.dll</HintPath>
+    </Reference>
+    <Reference Include="AForge.Imaging, Version=2.2.5.0, Culture=neutral, PublicKeyToken=ba8ddea9676ca48b, processorArchitecture=MSIL">
+      <HintPath>..\packages\AForge.Imaging.2.2.5\lib\AForge.Imaging.dll</HintPath>
+    </Reference>
+    <Reference Include="AForge.Math, Version=2.2.5.0, Culture=neutral, PublicKeyToken=abba2e25397ee8c9, processorArchitecture=MSIL">
+      <HintPath>..\packages\AForge.Math.2.2.5\lib\AForge.Math.dll</HintPath>
+    </Reference>
+    <Reference Include="AForge.Video, Version=2.2.5.0, Culture=neutral, PublicKeyToken=cbfb6e07d173c401, processorArchitecture=MSIL">
+      <HintPath>..\packages\AForge.Video.2.2.5\lib\AForge.Video.dll</HintPath>
+    </Reference>
+    <Reference Include="AForge.Video.DirectShow, Version=2.2.5.0, Culture=neutral, PublicKeyToken=61ea4348d43881b7, processorArchitecture=MSIL">
+      <HintPath>..\packages\AForge.Video.DirectShow.2.2.5\lib\AForge.Video.DirectShow.dll</HintPath>
+    </Reference>
+    <Reference Include="bolt5.CloneCopy, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\bolt5.CloneCopy.1.0.0\lib\net40\bolt5.CloneCopy.dll</HintPath>
+    </Reference>
+    <Reference Include="bolt5.CustomControls.Wpf, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\bolt5.CustomControls.Wpf.1.0.0\lib\net45\bolt5.CustomControls.Wpf.dll</HintPath>
+    </Reference>
+    <Reference Include="bolt5.CustomHtmlCefEditor, Version=1.0.0.0, Culture=neutral, processorArchitecture=x86">
+      <HintPath>..\packages\bolt5.CustomHtmlCefEditor.1.0.0\lib\net452\bolt5.CustomHtmlCefEditor.dll</HintPath>
+    </Reference>
+    <Reference Include="bolt5.CustomMonthlyCalendar, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\bolt5.CustomMonthlyCalendar.1.0.0\lib\net45\bolt5.CustomMonthlyCalendar.dll</HintPath>
+    </Reference>
+    <Reference Include="bolt5.ModalWpf, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\bolt5.ModalWpf.1.0.0\lib\net45\bolt5.ModalWpf.dll</HintPath>
+    </Reference>
+    <Reference Include="BouncyCastle.Crypto, Version=1.8.6.0, Culture=neutral, PublicKeyToken=0e99375e54769942, processorArchitecture=MSIL">
+      <HintPath>..\packages\Portable.BouncyCastle.1.8.6\lib\net40\BouncyCastle.Crypto.dll</HintPath>
+    </Reference>
+    <Reference Include="CefSharp, Version=90.6.70.0, Culture=neutral, PublicKeyToken=40c4b6fc221f4138, processorArchitecture=MSIL">
+      <HintPath>..\packages\CefSharp.Common.90.6.70\lib\net452\CefSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="CefSharp.Core, Version=90.6.70.0, Culture=neutral, PublicKeyToken=40c4b6fc221f4138, processorArchitecture=MSIL">
+      <HintPath>..\packages\CefSharp.Common.90.6.70\lib\net452\CefSharp.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="CefSharp.Wpf, Version=90.6.70.0, Culture=neutral, PublicKeyToken=40c4b6fc221f4138, processorArchitecture=MSIL">
+      <HintPath>..\packages\CefSharp.Wpf.90.6.70\lib\net452\CefSharp.Wpf.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.4.4\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.4.4\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
+    <Reference Include="FontIcons.Wpf.FontAwesome, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\FontIcons.Wpf.FontAwesome.1.0.0\lib\net40\FontIcons.Wpf.FontAwesome.dll</HintPath>
+    </Reference>
+    <Reference Include="Ghostscript.NET, Version=1.2.3.0, Culture=neutral, PublicKeyToken=f85051de34525b59, processorArchitecture=MSIL">
+      <HintPath>..\packages\Ghostscript.NET.1.2.3\lib\net40\Ghostscript.NET.dll</HintPath>
+    </Reference>
+    <Reference Include="HtmlAgilityPack, Version=1.11.32.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
+      <HintPath>..\packages\HtmlAgilityPack.1.11.32\lib\Net45\HtmlAgilityPack.dll</HintPath>
+    </Reference>
+    <Reference Include="ICSharpCode.SharpZipLib, Version=1.2.0.246, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpZipLib.1.2.0\lib\net45\ICSharpCode.SharpZipLib.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.ReportViewer.Common, Version=12.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.ReportViewer.Runtime.Common.12.0.2402.15\lib\Microsoft.ReportViewer.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.ReportViewer.DataVisualization, Version=12.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.ReportViewer.Runtime.Common.12.0.2402.15\lib\Microsoft.ReportViewer.DataVisualization.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.ReportViewer.ProcessingObjectModel, Version=12.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.ReportViewer.Runtime.Common.12.0.2402.15\lib\Microsoft.ReportViewer.ProcessingObjectModel.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.ReportViewer.WinForms, Version=12.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.ReportViewer.Runtime.WinForms.12.0.2402.15\lib\Microsoft.ReportViewer.WinForms.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.SqlServer.Types, Version=12.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.SqlServer.Types.12.0.5000.0\lib\net40\Microsoft.SqlServer.Types.dll</HintPath>
+    </Reference>
+    <Reference Include="NPOI, Version=2.5.1.0, Culture=neutral, PublicKeyToken=0df73ec7942b34e1, processorArchitecture=MSIL">
+      <HintPath>..\packages\NPOI.2.5.1\lib\net45\NPOI.dll</HintPath>
+    </Reference>
+    <Reference Include="NPOI.OOXML, Version=2.5.1.0, Culture=neutral, PublicKeyToken=0df73ec7942b34e1, processorArchitecture=MSIL">
+      <HintPath>..\packages\NPOI.2.5.1\lib\net45\NPOI.OOXML.dll</HintPath>
+    </Reference>
+    <Reference Include="NPOI.OpenXml4Net, Version=2.5.1.0, Culture=neutral, PublicKeyToken=0df73ec7942b34e1, processorArchitecture=MSIL">
+      <HintPath>..\packages\NPOI.2.5.1\lib\net45\NPOI.OpenXml4Net.dll</HintPath>
+    </Reference>
+    <Reference Include="NPOI.OpenXmlFormats, Version=2.5.1.0, Culture=neutral, PublicKeyToken=0df73ec7942b34e1, processorArchitecture=MSIL">
+      <HintPath>..\packages\NPOI.2.5.1\lib\net45\NPOI.OpenXmlFormats.dll</HintPath>
+    </Reference>
+    <Reference Include="PresentationFramework.Aero2" />
+    <Reference Include="PropertyChanged, Version=3.3.3.0, Culture=neutral, PublicKeyToken=ee3ee20bcf148ddd, processorArchitecture=MSIL">
+      <HintPath>..\packages\PropertyChanged.Fody.3.3.3\lib\net40\PropertyChanged.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.SQLite, Version=1.0.113.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
+      <HintPath>..\packages\Stub.System.Data.SQLite.Core.NetFramework.1.0.113.3\lib\net45\System.Data.SQLite.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Data.SQLite.EF6, Version=1.0.113.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Data.SQLite.EF6.1.0.113.0\lib\net45\System.Data.SQLite.EF6.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Data.SQLite.Linq, Version=1.0.113.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Data.SQLite.Linq.1.0.113.0\lib\net45\System.Data.SQLite.Linq.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xaml">
+      <RequiredTargetFramework>4.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="Tesseract, Version=4.1.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Tesseract.4.1.1\lib\net45\Tesseract.dll</HintPath>
+    </Reference>
+    <Reference Include="WindowsBase" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="WindowsFormsIntegration" />
+    <Reference Include="Xceed.Wpf.AvalonDock, Version=4.0.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
+      <HintPath>..\packages\Extended.Wpf.Toolkit.4.0.2\lib\net40\Xceed.Wpf.AvalonDock.dll</HintPath>
+    </Reference>
+    <Reference Include="Xceed.Wpf.AvalonDock.Themes.Aero, Version=4.0.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
+      <HintPath>..\packages\Extended.Wpf.Toolkit.4.0.2\lib\net40\Xceed.Wpf.AvalonDock.Themes.Aero.dll</HintPath>
+    </Reference>
+    <Reference Include="Xceed.Wpf.AvalonDock.Themes.Metro, Version=4.0.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
+      <HintPath>..\packages\Extended.Wpf.Toolkit.4.0.2\lib\net40\Xceed.Wpf.AvalonDock.Themes.Metro.dll</HintPath>
+    </Reference>
+    <Reference Include="Xceed.Wpf.AvalonDock.Themes.VS2010, Version=4.0.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
+      <HintPath>..\packages\Extended.Wpf.Toolkit.4.0.2\lib\net40\Xceed.Wpf.AvalonDock.Themes.VS2010.dll</HintPath>
+    </Reference>
+    <Reference Include="Xceed.Wpf.Toolkit, Version=4.0.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
+      <HintPath>..\packages\Extended.Wpf.Toolkit.4.0.2\lib\net40\Xceed.Wpf.Toolkit.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ApplicationDefinition Include="App.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </ApplicationDefinition>
+    <Compile Include="Classes\BackupRestoreHelper.cs" />
+    <Compile Include="Classes\BillsPeriodContextHelper.cs" />
+    <Compile Include="Classes\CheckWriterHelper.cs" />
+    <Compile Include="Classes\DateRangeHelper.cs" />
+    <Compile Include="Classes\ExcelHelper.cs" />
+    <Compile Include="Classes\FigureToWords.cs" />
+    <Compile Include="Classes\PdfHelper.cs" />
+    <Compile Include="Classes\PeriodCalendarHelper.cs" />
+    <Compile Include="Classes\PettyCashContextHelper.cs" />
+    <Compile Include="Classes\EnumDescriptionTypeConverter.cs" />
+    <Compile Include="Classes\FileHelper.cs" />
+    <Compile Include="Classes\ImageHelper.cs" />
+    <Compile Include="Classes\MiscHelper.cs" />
+    <Compile Include="Classes\OcrHelper.cs" />
+    <Compile Include="Classes\RelayCommand.cs" />
+    <Compile Include="Classes\VisualHelper.cs" />
+    <Compile Include="Converters\CurrencyToWordsConverter.cs" />
+    <Compile Include="Converters\NegativeToBoolConverter.cs" />
+    <Compile Include="Converters\TinNumberDisplayConverter.cs" />
+    <Compile Include="Converters\PercentDisplayConverter.cs" />
+    <Compile Include="Converters\HierarchyMarginConverter.cs" />
+    <Compile Include="Converters\BitmapImageConverter.cs" />
+    <Compile Include="Converters\HtmlToPlainTextConverter.cs" />
+    <Compile Include="Converters\BooleanlnverseConverter.cs" />
+    <Compile Include="Converters\CurrencyDisplayConverter.cs" />
+    <Compile Include="Converters\MonthNameConverter.cs" />
+    <Compile Include="Converters\MultiValueNumberOperationConverter.cs" />
+    <Compile Include="Converters\ObjectToBoolConverter.cs" />
+    <Compile Include="Converters\OrdinalStringConverter.cs" />
+    <Compile Include="Converters\ValueConverterGroup.cs" />
+    <Compile Include="Converters\VisibilityFromBoolConverter.cs" />
+    <Compile Include="Enums\BankAccountType.cs" />
+    <Compile Include="Enums\BillTaxType.cs" />
+    <Compile Include="Enums\BillPeriodType.cs" />
+    <Compile Include="Enums\DateRangeType.cs" />
+    <Compile Include="Enums\EnumDescriptionTypeConverter.cs" />
+    <Compile Include="Enums\TransactionType.cs" />
+    <Compile Include="Extensions\BoolExt.cs" />
+    <Compile Include="Extensions\DateTimeExt.cs" />
+    <Compile Include="Extensions\EnumExt.cs" />
+    <Compile Include="Extensions\NPOIExt.cs" />
+    <Compile Include="Extensions\StringExt.cs" />
+    <Compile Include="Extensions\TaskExt.cs" />
+    <Compile Include="InstanceManager.cs" />
+    <Compile Include="Logs.cs" />
+    <Compile Include="Objects\Bills\BillPaymentViewModel.cs" />
+    <Compile Include="Objects\Bills\BillPeriodInclusionViewModel.cs" />
+    <Compile Include="Objects\Bills\BillPeriodViewModel.cs" />
+    <Compile Include="Objects\Calendar\IPeriodGetter.cs" />
+    <Compile Include="Objects\Calendar\PeriodCalendaDisplay.cs" />
+    <Compile Include="Objects\Calendar\PeriodCalendarDisplayCollection.cs" />
+    <Compile Include="Objects\CategoryViewModel.cs" />
+    <Compile Include="Objects\CheckWriter\CheckWriterAccountViewModel.cs" />
+    <Compile Include="Objects\CheckWriter\CheckWriterBankViewModel.cs" />
+    <Compile Include="Objects\CheckWriter\CheckWriterCheckViewModel.cs" />
+    <Compile Include="Objects\CompanyViewModel.cs" />
+    <Compile Include="Objects\DepartmentViewModel.cs" />
+    <Compile Include="Objects\PayeeViewModel.cs" />
+    <Compile Include="Objects\PettyCashViewModel.cs" />
+    <Compile Include="Objects\VoucherViewModel.cs" />
+    <Compile Include="Reports\Objects\BankCheck.cs" />
+    <Compile Include="Reports\report form.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Reports\report form.Designer.cs">
+      <DependentUpon>report form.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Reports\ReportsHelper.cs" />
+    <Compile Include="SqlServerTypes\Loader.cs" />
+    <Compile Include="Sub Modals\adminPassword_modal.xaml.cs">
+      <DependentUpon>adminPassword_modal.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Sub Modals\billPaymentPayOnly_modal.xaml.cs">
+      <DependentUpon>billPaymentPayOnly_modal.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Sub Modals\billPaymentAddEdit_modal.xaml.cs">
+      <DependentUpon>billPaymentAddEdit_modal.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Sub Modals\billPeriod_history_preview.xaml.cs">
+      <DependentUpon>billPeriod_history_preview.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Sub Modals\billPeriod_preview.xaml.cs">
+      <DependentUpon>billPeriod_preview.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Sub Modals\billPeriodAddEdit_modal.xaml.cs">
+      <DependentUpon>billPeriodAddEdit_modal.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Sub Modals\CheckWriter\account add modal.xaml.cs">
+      <DependentUpon>account add modal.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Sub Modals\CheckWriter\bank add modal.xaml.cs">
+      <DependentUpon>bank add modal.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Sub Modals\CheckWriter\check add modal.xaml.cs">
+      <DependentUpon>check add modal.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Sub Modals\departmentAddEdit_modal.xaml.cs">
+      <DependentUpon>departmentAddEdit_modal.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Sub Modals\categoryAddEdit_modal.xaml.cs">
+      <DependentUpon>categoryAddEdit_modal.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Sub Modals\ocrText_modal.xaml.cs">
+      <DependentUpon>ocrText_modal.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Sub Modals\openCamera_modal.xaml.cs">
+      <DependentUpon>openCamera_modal.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Sub Modals\companyAddEdit_modal.xaml.cs">
+      <DependentUpon>companyAddEdit_modal.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Sub Modals\payeeAddEdit_modal.xaml.cs">
+      <DependentUpon>payeeAddEdit_modal.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Sub Modals\pettyCashEditOnly_modal.xaml.cs">
+      <DependentUpon>pettyCashEditOnly_modal.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Sub Modals\pettyCashAdminAddEdit_modal.xaml.cs">
+      <DependentUpon>pettyCashAdminAddEdit_modal.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Sub Modals\pettyCashAddEdit_modal.xaml.cs">
+      <DependentUpon>pettyCashAddEdit_modal.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Sub Modals\replenishAdd_modal.xaml.cs">
+      <DependentUpon>replenishAdd_modal.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Sub Modals\voucherAddEdit_modal.xaml.cs">
+      <DependentUpon>voucherAddEdit_modal.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Tab Pages\backup_restore page.xaml.cs">
+      <DependentUpon>backup_restore page.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Tab Pages\bill calendar page.xaml.cs">
+      <DependentUpon>bill calendar page.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Tab Pages\bill payment page.xaml.cs">
+      <DependentUpon>bill payment page.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Tab Pages\bill category list page.xaml.cs">
+      <DependentUpon>bill category list page.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Tab Pages\check writer account list page.xaml.cs">
+      <DependentUpon>check writer account list page.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Tab Pages\check writer bank list page.xaml.cs">
+      <DependentUpon>check writer bank list page.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Tab Pages\check writer page.xaml.cs">
+      <DependentUpon>check writer page.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Tab Pages\department list page.xaml.cs">
+      <DependentUpon>department list page.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Tab Pages\company list page.xaml.cs">
+      <DependentUpon>company list page.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Tab Pages\category list page.xaml.cs">
+      <DependentUpon>category list page.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Tab Pages\payee list page.xaml.cs">
+      <DependentUpon>payee list page.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Tab Pages\setup page.xaml.cs">
+      <DependentUpon>setup page.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Tab Pages\transactions page.xaml.cs">
+      <DependentUpon>transactions page.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Tab Pages\tutorials calendar.xaml.cs">
+      <DependentUpon>tutorials calendar.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Tab Pages\tutorials.xaml.cs">
+      <DependentUpon>tutorials.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Tab Pages\voucher list page.xaml.cs">
+      <DependentUpon>voucher list page.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Tab Pages\_test page.xaml.cs">
+      <DependentUpon>_test page.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Tutorials Module\EntryLevel.cs" />
+    <Compile Include="Tutorials Module\Modals\tutorialCategoryAddEdit_modal.xaml.cs">
+      <DependentUpon>tutorialCategoryAddEdit_modal.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Tutorials Module\Modals\tutorialVideoAddEdit_modal.xaml.cs">
+      <DependentUpon>tutorialVideoAddEdit_modal.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Tutorials Module\Objects\TutorialCategoryViewModel.cs" />
+    <Compile Include="Tutorials Module\Objects\TutorialVideoViewModel.cs" />
+    <Compile Include="Tutorials Module\TutorialPeriodType.cs" />
+    <Compile Include="Tutorials Module\TutorialsHelper.cs" />
+    <Compile Include="web printing\objects\BillXml.cs" />
+    <Compile Include="web printing\web printing modal.xaml.cs">
+      <DependentUpon>web printing modal.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="web printing\WebPrintHelper.cs" />
+    <Page Include="MainWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Compile Include="App.xaml.cs">
+      <DependentUpon>App.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MainWindow.xaml.cs">
+      <DependentUpon>MainWindow.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Page Include="Styles\button styles.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Styles\checkbox styles.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Styles\converters.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Styles\datagrid styles.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Styles\main styles.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Styles\monthly calendar styles.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Styles\PlusMinusExpander.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Styles\TutorialCalendarStyle.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Sub Modals\adminPassword_modal.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Sub Modals\billPaymentPayOnly_modal.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Sub Modals\billPaymentAddEdit_modal.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Sub Modals\billPeriod_history_preview.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Sub Modals\billPeriod_preview.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Sub Modals\billPeriodAddEdit_modal.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Sub Modals\CheckWriter\account add modal.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Sub Modals\CheckWriter\bank add modal.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Sub Modals\CheckWriter\check add modal.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Sub Modals\departmentAddEdit_modal.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Sub Modals\categoryAddEdit_modal.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Sub Modals\ocrText_modal.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Sub Modals\openCamera_modal.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Sub Modals\companyAddEdit_modal.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Sub Modals\payeeAddEdit_modal.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Sub Modals\pettyCashEditOnly_modal.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Sub Modals\pettyCashAdminAddEdit_modal.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Sub Modals\pettyCashAddEdit_modal.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Sub Modals\replenishAdd_modal.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Sub Modals\voucherAddEdit_modal.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Tab Pages\backup_restore page.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Tab Pages\bill calendar page.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Tab Pages\bill payment page.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Tab Pages\bill category list page.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Tab Pages\check writer account list page.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Tab Pages\check writer bank list page.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Tab Pages\check writer page.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Tab Pages\department list page.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Tab Pages\company list page.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Tab Pages\category list page.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Tab Pages\payee list page.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Tab Pages\setup page.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Tab Pages\transactions page.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Tab Pages\tutorials calendar.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Tab Pages\tutorials.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Tab Pages\voucher list page.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Tab Pages\_test page.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Tutorials Module\Modals\tutorialCategoryAddEdit_modal.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Tutorials Module\Modals\tutorialVideoAddEdit_modal.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="web printing\web printing modal.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reports\report form.resx">
+      <DependentUpon>report form.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reports\ReportFiles\bank check report.rdlc" />
+    <None Include="packages.config" />
+    <None Include="Properties\DataSources\Petty_Cash.Reports.Objects.BankCheck.datasource" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="tessdata\**">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Petty Cash.Bills.Model\Petty Cash.Bills.Model.csproj">
+      <Project>{16a6b2f1-4f04-4ab8-813e-a599b851deb6}</Project>
+      <Name>Petty Cash.Bills.Model</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Petty Cash.Model\Petty Cash.Model.csproj">
+      <Project>{0971185d-257d-4f12-a51c-b48b8c3c93a6}</Project>
+      <Name>Petty Cash.Model</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Tutorials.Model\Tutorials.Model.csproj">
+      <Project>{95f0d017-e29e-4ab6-b19e-9fc85b29ff1b}</Project>
+      <Name>Tutorials.Model</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="petty cash.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="gs\**">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="res\no image available.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <COMReference Include="SHDocVw">
+      <Guid>{EAB22AC0-30C1-11CF-A7EB-0000C05BAE0B}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>1</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="templates\" />
+    <Folder Include="web printing\webpage packs\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="web printing\stylesheets\billLabels.xsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="res\add bill.JPG" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="SqlServerTypes\readme.htm" />
+    <Content Include="SqlServerTypes\x64\msvcr100.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SqlServerTypes\x64\SqlServerSpatial120.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SqlServerTypes\x86\msvcr100.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SqlServerTypes\x86\SqlServerSpatial120.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="..\packages\Fody.6.4.0\build\Fody.targets" Condition="Exists('..\packages\Fody.6.4.0\build\Fody.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\Fody.6.4.0\build\Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Fody.6.4.0\build\Fody.targets'))" />
+    <Error Condition="!Exists('..\packages\PropertyChanged.Fody.3.3.3\build\PropertyChanged.Fody.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\PropertyChanged.Fody.3.3.3\build\PropertyChanged.Fody.props'))" />
+    <Error Condition="!Exists('..\packages\EntityFramework.6.4.4\build\EntityFramework.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\EntityFramework.6.4.4\build\EntityFramework.props'))" />
+    <Error Condition="!Exists('..\packages\EntityFramework.6.4.4\build\EntityFramework.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\EntityFramework.6.4.4\build\EntityFramework.targets'))" />
+    <Error Condition="!Exists('..\packages\Stub.System.Data.SQLite.Core.NetFramework.1.0.113.3\build\net45\Stub.System.Data.SQLite.Core.NetFramework.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Stub.System.Data.SQLite.Core.NetFramework.1.0.113.3\build\net45\Stub.System.Data.SQLite.Core.NetFramework.targets'))" />
+    <Error Condition="!Exists('..\packages\Tesseract.4.1.1\build\Tesseract.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Tesseract.4.1.1\build\Tesseract.targets'))" />
+    <Error Condition="!Exists('..\packages\cef.redist.x64.90.6.7\build\cef.redist.x64.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\cef.redist.x64.90.6.7\build\cef.redist.x64.props'))" />
+    <Error Condition="!Exists('..\packages\cef.redist.x86.90.6.7\build\cef.redist.x86.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\cef.redist.x86.90.6.7\build\cef.redist.x86.props'))" />
+    <Error Condition="!Exists('..\packages\CefSharp.Common.90.6.70\build\CefSharp.Common.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\CefSharp.Common.90.6.70\build\CefSharp.Common.props'))" />
+    <Error Condition="!Exists('..\packages\CefSharp.Common.90.6.70\build\CefSharp.Common.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\CefSharp.Common.90.6.70\build\CefSharp.Common.targets'))" />
+  </Target>
+  <Import Project="..\packages\EntityFramework.6.4.4\build\EntityFramework.targets" Condition="Exists('..\packages\EntityFramework.6.4.4\build\EntityFramework.targets')" />
+  <Import Project="..\packages\Stub.System.Data.SQLite.Core.NetFramework.1.0.113.3\build\net45\Stub.System.Data.SQLite.Core.NetFramework.targets" Condition="Exists('..\packages\Stub.System.Data.SQLite.Core.NetFramework.1.0.113.3\build\net45\Stub.System.Data.SQLite.Core.NetFramework.targets')" />
+  <Import Project="..\packages\Tesseract.4.1.1\build\Tesseract.targets" Condition="Exists('..\packages\Tesseract.4.1.1\build\Tesseract.targets')" />
+  <Import Project="..\packages\CefSharp.Common.90.6.70\build\CefSharp.Common.targets" Condition="Exists('..\packages\CefSharp.Common.90.6.70\build\CefSharp.Common.targets')" />
+</Project>

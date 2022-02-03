@@ -1,0 +1,413 @@
+﻿<Page x:Class="Petty_Cash.Tab_Pages.voucher_list_page"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:Petty_Cash.Tab_Pages"
+      xmlns:me="clr-namespace:Petty_Cash"
+      xmlns:customs="clr-namespace:bolt5.CustomControls;assembly=bolt5.CustomControls.Wpf"
+      xmlns:xceed="clr-namespace:Xceed.Wpf.Toolkit;assembly=Xceed.Wpf.Toolkit"
+      mc:Ignorable="d" 
+      d:DesignHeight="450" d:DesignWidth="800"
+      Title="voucher_list_page" Loaded="Page_Loaded">
+    <Grid Background="White">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="150"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <!-- filters and buttons -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal" VerticalAlignment="Top" HorizontalAlignment="Left">
+            <!-- filters -->
+            <GroupBox x:Name="filtersGroup" Header="Filters">
+                <StackPanel Orientation="Vertical" Margin="{StaticResource Filters.GroupBox.Margin}">
+                    <StackPanel Orientation="Horizontal" Margin="{StaticResource Filters.Vertical.Margin}">
+                        <StackPanel Orientation="Vertical" Margin="{StaticResource Filters.Fields.Margin}">
+                            <TextBlock Text="Payee"/>
+                            <ComboBox Width="200" MaxDropDownHeight="300" ItemsSource="{Binding PayeeList}"
+                                      Validation.ErrorTemplate="{x:Null}"
+                                      SelectedValue="{Binding FilterPayee}" SelectedValuePath="Id">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock>
+                                            <Run Text="{Binding PayeeName}"/>
+                                            <Run Text="{Binding Amount, Converter={StaticResource DisplayNoCurrency}}" Foreground="Red" FontWeight="Bold"/>
+                                        </TextBlock>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                        </StackPanel>
+                        <StackPanel Orientation="Vertical" Margin="{StaticResource Filters.Fields.Margin}">
+                            <TextBlock Text="Voucher No."/>
+                            <TextBox Text="{Binding FilterVoucherNumber,UpdateSourceTrigger=PropertyChanged}" Width="80"/>
+                        </StackPanel>
+                        <CheckBox Content="Show Open Vouchers" IsChecked="{Binding ShowOnlyOpenVouchers}"
+                                  Margin="{StaticResource Filters.Fields.Margin}" VerticalAlignment="Bottom"/>
+                        <CheckBox Content="Show Replenish" IsChecked="{Binding ShowReplenishVouchers}"
+                                  Margin="{StaticResource Filters.Fields.Margin}" VerticalAlignment="Bottom"/>
+                        <StackPanel Orientation="Vertical" Margin="{StaticResource Filters.Fields.Margin}" VerticalAlignment="Bottom">
+                            <Button Content="Reset" Click="ResetFilters_btn_Click"/>
+                        </StackPanel>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="{StaticResource Filters.Vertical.Margin}">
+                        <StackPanel Orientation="Vertical" Margin="{StaticResource Filters.Fields.Margin}">
+                            <TextBlock Text="Date Range"/>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="from " VerticalAlignment="Center" Foreground="Gray"/>
+                                <xceed:DateTimePicker x:Name="filterDateFrom" Value="{Binding FilterDateFrom,UpdateSourceTrigger=Explicit}"
+                                                      Width="100" Margin="{StaticResource Filters.Subfields.Margin}"/>
+                                <TextBlock Text="to " VerticalAlignment="Center" Foreground="Gray"/>
+                                <xceed:DateTimePicker x:Name="filterDateTo" Value="{Binding FilterDateTo,UpdateSourceTrigger=Explicit}"
+                                                      Width="100" Margin="{StaticResource Filters.Subfields.Margin}"/>
+
+                                <Button Content="This Month" Style="{StaticResource LinkButton}" Click="ApplyDateRange_btn_Click"
+                                        Margin="5,0,0,0" Tag="{x:Static me:DateRangeType.ThisMonth}"/>
+                                <Button Content="Last Month" Style="{StaticResource LinkButton}"  Click="ApplyDateRange_btn_Click"
+                                        Margin="8,0,0,0" Tag="{x:Static me:DateRangeType.LastMonth}"/>
+                                <Button Content="Today" Style="{StaticResource LinkButton}"  Click="ApplyDateRange_btn_Click"
+                                        Margin="8,0,0,0" Tag="{x:Static me:DateRangeType.Today}"/>
+                                <Button Content="Apply Date Range" Click="ApplyDateRange_btn_Click" Margin="8,0,0,0"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </StackPanel>
+                </StackPanel>
+            </GroupBox>
+            <!-- buttons -->
+            <UniformGrid Columns="1" HorizontalAlignment="Left" Margin="50,10,0,0">
+                <!-- balance -->
+                <Grid x:Name="totalsGroup" VerticalAlignment="Top">
+                    <TextBlock FontSize="16" VerticalAlignment="Top">
+                    <Run Text="Bal:"/>
+                    <Run Text="{Binding BalanceTotal,Mode=OneWay,Converter={StaticResource DisplayNoCurrency}}" FontWeight="Bold">
+                        <Run.Style>
+                            <Style TargetType="{x:Type Run}">
+                                <Setter Property="Foreground" Value="Blue"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding BalanceTotal,Converter={StaticResource NegativeToBoolConverter}}" Value="False">
+                                        <Setter Property="Foreground" Value="Red"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Run.Style>
+                    </Run>
+                    </TextBlock>
+                </Grid>
+                <Button Content="Add Voucher" Click="AddVoucher_btn_Click"
+                    Background="LightGreen" VerticalAlignment="Bottom"/>
+                <Button Content="Replenish Petty Cash" Click="ReplenishPettyCash_btn_Click"
+                    Background="LightPink" VerticalAlignment="Bottom"/>
+            </UniformGrid>
+        </StackPanel>
+
+        <!-- voucher details popup -->
+        <customs:PopupModal x:Name="voucherDetailsPopup" Placement="Bottom" VerticalOffset="3">
+            <Grid>
+                <Grid.Effect>
+                    <DropShadowEffect/>
+                </Grid.Effect>
+                <Border Background="White" BorderBrush="Silver" BorderThickness="1" Margin="0,0,3,3">
+                    <Grid Margin="15">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                            <TextBlock>
+                                <Run Text="Voucher No.:" Foreground="Gray"/>
+                                <Run Text="{Binding Voucher.VoucherNumber,Mode=OneWay}"/>
+                            </TextBlock>
+                            <TextBlock Margin="30,0,0,0">
+                                <Run Text="Payee:" Foreground="Gray"/>
+                                <Run Text="{Binding Voucher.Payee.PayeeName,Mode=OneWay}"/>
+                            </TextBlock>
+                            <TextBlock Margin="30,0,0,0">
+                                <Run Text="Voucher Amount:" Foreground="Gray"/>
+                                <Run Text="{Binding Voucher.AmountReceived,Mode=OneWay,Converter={StaticResource DisplayNoCurrency}}" Foreground="DarkGreen"/>
+                            </TextBlock>
+                        </StackPanel>
+                        <DataGrid Grid.Row="1" ItemsSource="{Binding Transactions}">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Date" Binding="{Binding TransactionDate, StringFormat=d}" Width="80"
+                                        HeaderStyle="{StaticResource DataGridColumnHeader.Right}"
+                                        ElementStyle="{StaticResource DataGridTextColumn.ElementStyle.Right}"/>
+                                <DataGridTextColumn Header="Category" Binding="{Binding Category.CategoryName}" Width="100"
+                                        ElementStyle="{StaticResource DataGridTextColumn.ElementStyle.Left}"/>
+                                <DataGridTextColumn Header="Expense" Binding="{Binding AmountOut, Converter={StaticResource CurrencyDisplayConverter}}" Width="80"
+                                        HeaderStyle="{StaticResource DataGridColumnHeader.Right}">
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Right}">
+                                            <Setter Property="Foreground" Value="DarkRed"/>
+                                            <Setter Property="FontWeight" Value="Bold"/>
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
+                                <DataGridTextColumn Header="Return" Binding="{Binding AmountReturn, Converter={StaticResource CurrencyDisplayConverter}}" Width="80"
+                                        HeaderStyle="{StaticResource DataGridColumnHeader.Right}">
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Right}">
+                                            <Setter Property="Foreground" Value="DarkBlue"/>
+                                            <Setter Property="FontWeight" Value="Bold"/>
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
+                                <DataGridTextColumn Header="Particulars (Purpose)" Binding="{Binding Purpose}" Width="230"
+                                        ElementStyle="{StaticResource DataGridTextColumn.ElementStyle.Left}"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+                </Border>
+            </Grid>
+        </customs:PopupModal>
+        
+        <!-- totals -->
+        <Grid x:Name="totalsGrid" Grid.Row="1">
+            <Button Grid.Column="7" Content="{Binding TotalReplenish, Converter={StaticResource DisplayNoCurrency}}" Style="{StaticResource TotalsStyle}"/>
+            <Button Grid.Column="8" Content="{Binding TotalVoucher, Converter={StaticResource DisplayNoCurrency}}" Style="{StaticResource TotalsStyle}"/>
+            <Button Grid.Column="9" Content="{Binding TotalExpense, Converter={StaticResource DisplayNoCurrency}}" Style="{StaticResource TotalsStyle}"/>
+        </Grid>
+        
+        <!-- voucher list -->
+        <DataGrid x:Name="vouchersDg" Grid.Row="2">
+            <DataGrid.Columns>
+                <DataGridTemplateColumn CellStyle="{StaticResource DataGridCell.Style.ShowOnHover}">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button FontFamily="{StaticResource fontawesome-solid}" Content="{StaticResource fa-pen}"
+                                    Style="{StaticResource BorderlessButton}" Click="EditVoucher_btn_Click"
+                                    Foreground="Navy" ToolTip="Edit voucher"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Header="Voucher No." Binding="{Binding VoucherNumber}"
+                                    HeaderStyle="{StaticResource DataGridColumnHeader.Right}">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Right}">
+                            <Setter Property="Foreground" Value="Black"/>
+                            <Setter Property="FontWeight" Value="Normal"/>
+                            <Style.Triggers>
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding TransactionType}" Value="{x:Static me:TransactionType.Replenish}"/>
+                                    </MultiDataTrigger.Conditions>
+                                    <Setter Property="Foreground" Value="Blue"/>
+                                </MultiDataTrigger>
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding TransactionType}" Value="{x:Static me:TransactionType.Expense}"/>
+                                        <Condition Binding="{Binding IsLiquidated}" Value="False"/>
+                                    </MultiDataTrigger.Conditions>
+                                    <Setter Property="Foreground" Value="Red"/>
+                                    <Setter Property="FontWeight" Value="Bold"/>
+                                </MultiDataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <DataGridTextColumn Binding="{Binding Payee.PayeeName}" Width="150">
+                    <DataGridTextColumn.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock>Payee</TextBlock>
+                            <TextBlock Style="{StaticResource QuestionTextIcon}" Margin="5,0,0,0">
+                                <TextBlock.ToolTip>
+                                    <TextBlock>
+                                        Red color of <Run Foreground="Red">Payee Name</Run> means that payee still have Open Voucher which is NOT yet Liquidated.
+                                    </TextBlock>
+                                </TextBlock.ToolTip>
+                            </TextBlock>
+                        </StackPanel>
+                    </DataGridTextColumn.Header>
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Left}">
+                            <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+                            <Setter Property="Foreground" Value="Black"/>
+                            <Style.Triggers>
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding TransactionType}" Value="{x:Static me:TransactionType.Replenish}"/>
+                                    </MultiDataTrigger.Conditions>
+                                    <Setter Property="Foreground" Value="Blue"/>
+                                </MultiDataTrigger>
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding TransactionType}" Value="{x:Static me:TransactionType.Expense}"/>
+                                        <Condition Binding="{Binding IsLiquidated}" Value="False"/>
+                                    </MultiDataTrigger.Conditions>
+                                    <Setter Property="Foreground" Value="Red"/>
+                                </MultiDataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <DataGridTextColumn Header="Date" Binding="{Binding VoucherDate, StringFormat=d}" Width="80" HeaderStyle="{StaticResource DataGridColumnHeader.Right}" ElementStyle="{StaticResource DataGridTextColumn.ElementStyle.Right}"/>
+                <DataGridTemplateColumn CellStyle="{StaticResource DataGridCell.Style.ShowOnHover}" Width="60">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button Content="Liquidate" Click="LiquidateVoucher_btn_Click" Background="Salmon">
+                                <Button.Style>
+                                    <Style TargetType="{x:Type Button}">
+                                        <Setter Property="Visibility" Value="Hidden"/>
+                                        <Style.Triggers>
+                                            <MultiDataTrigger>
+                                                <MultiDataTrigger.Conditions>
+                                                    <Condition Binding="{Binding TransactionType}" Value="{x:Static me:TransactionType.Expense}"/>
+                                                    <Condition Binding="{Binding IsLiquidated}" Value="False"/>
+                                                </MultiDataTrigger.Conditions>
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                            </MultiDataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                            </Button>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn CellStyle="{StaticResource DataGridCell.Style.ShowOnHover}" Width="60">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button Content="CANCEL" Click="CancelVoucher_btn_Click" Background="Red" Foreground="White">
+                                <Button.Style>
+                                    <Style TargetType="{x:Type Button}">
+                                        <Setter Property="Visibility" Value="Hidden"/>
+                                        <Style.Triggers>
+                                            <MultiDataTrigger>
+                                                <MultiDataTrigger.Conditions>
+                                                    <Condition Binding="{Binding TransactionType}" Value="{x:Static me:TransactionType.Replenish}"/>
+                                                    <Condition Binding="{Binding HasAmountReplenished}" Value="True"/>
+                                                </MultiDataTrigger.Conditions>
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                            </MultiDataTrigger>
+                                            <MultiDataTrigger>
+                                                <MultiDataTrigger.Conditions>
+                                                    <Condition Binding="{Binding TransactionType}" Value="{x:Static me:TransactionType.Expense}"/>
+                                                    <Condition Binding="{Binding HasExpenseAmount}" Value="True"/>
+                                                </MultiDataTrigger.Conditions>
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                            </MultiDataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                            </Button>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridCheckBoxColumn Header="Liquidated" Binding="{Binding IsLiquidated}">
+                    <DataGridCheckBoxColumn.ElementStyle>
+                        <Style TargetType="{x:Type CheckBox}">
+                            <Setter Property="VerticalAlignment" Value="Center"/>
+                            <Setter Property="HorizontalAlignment" Value="Center"/>
+                            <Setter Property="IsHitTestVisible" Value="False"/>
+                        </Style>
+                    </DataGridCheckBoxColumn.ElementStyle>
+                </DataGridCheckBoxColumn>
+                <DataGridTemplateColumn Header="Cash-In" SortMemberPath="AmountReplenished">
+                    <DataGridTemplateColumn.HeaderStyle>
+                        <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource DataGridColumnHeader.Right}">
+                            <Setter Property="Background" Value="LightPink"/>
+                        </Style>
+                    </DataGridTemplateColumn.HeaderStyle>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Foreground="Red" FontWeight="Bold" Width="90">
+                                <TextBlock.Style>
+                                    <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Right}">
+                                        <Setter Property="Text" Value="{Binding AmountReplenished, Converter={StaticResource DisplayNoCurrency}}"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding HasAmountReplenished}" Value="False">
+                                                <Setter Property="Text" Value="#VOID"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <!--<DataGridTextColumn Header="Cash-In" Binding="{Binding AmountReplenished, Converter={StaticResource DisplayNoCurrency}}" Width="90">
+                    <DataGridTextColumn.HeaderStyle>
+                        <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource DataGridColumnHeader.Right}">
+                            <Setter Property="Background" Value="LightPink"/>
+                        </Style>
+                    </DataGridTextColumn.HeaderStyle>
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Right}">
+                            <Setter Property="Foreground" Value="Red"/>
+                            <Setter Property="FontWeight" Value="Bold"/>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>-->
+                <DataGridTextColumn Header="Voucher Amount" Binding="{Binding AmountReceived, Converter={StaticResource DisplayNoCurrency}}" Width="90">
+                    <DataGridTextColumn.HeaderStyle>
+                        <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource DataGridColumnHeader.Right}">
+                            <Setter Property="Background" Value="LightGreen"/>
+                        </Style>
+                    </DataGridTextColumn.HeaderStyle>
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Right}">
+                            <Setter Property="Foreground" Value="DarkGreen"/>
+                            <Setter Property="FontWeight" Value="Bold"/>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <DataGridTemplateColumn Header="Expense Amount">
+                    <DataGridTemplateColumn.HeaderStyle>
+                        <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource DataGridColumnHeader.Right}">
+                            <Setter Property="Background" Value="Salmon"/>
+                        </Style>
+                    </DataGridTemplateColumn.HeaderStyle>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button Style="{StaticResource LinkButton}" Content="{Binding ExpenseAmount,Mode=OneWay,Converter={StaticResource DisplayNoCurrency}}"
+                                    Click="ShowVoucherDetails_btn_Click"
+                                    HorizontalAlignment="right" ToolTip="Show Voucher Details" Margin="{StaticResource DataGridTextCell.Margin}"
+                                    Foreground="DarkRed" FontWeight="Bold"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <!--<DataGridTextColumn Header="Expense Amount" Binding="{Binding ExpenseAmount, Converter={StaticResource DisplayNoCurrency}}" Width="90">
+                    <DataGridTextColumn.HeaderStyle>
+                        <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource DataGridColumnHeader.Right}">
+                            <Setter Property="Background" Value="Salmon"/>
+                        </Style>
+                    </DataGridTextColumn.HeaderStyle>
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Right}">
+                            <Setter Property="Foreground" Value="DarkRed"/>
+                            <Setter Property="FontWeight" Value="Bold"/>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>-->
+                <DataGridTextColumn Header="Return Amount" Binding="{Binding ReturnAmount, Converter={StaticResource DisplayNoCurrency}}" Width="90">
+                    <DataGridTextColumn.HeaderStyle>
+                        <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource DataGridColumnHeader.Right}">
+                            <Setter Property="Background" Value="SkyBlue"/>
+                        </Style>
+                    </DataGridTextColumn.HeaderStyle>
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Right}">
+                            <Setter Property="Foreground" Value="DarkBlue"/>
+                            <Setter Property="FontWeight" Value="Bold"/>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <DataGridTextColumn Header="Balance" Binding="{Binding BalanceAmount, Converter={StaticResource DisplayNoCurrency}}">
+                    <DataGridTextColumn.HeaderStyle>
+                        <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource DataGridColumnHeader.Right}">
+                        </Style>
+                    </DataGridTextColumn.HeaderStyle>
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Right}">
+                            <Setter Property="FontWeight" Value="Bold"/>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <DataGridTextColumn Header="Particulars" Binding="{Binding Particulars}" Width="300">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Left}">
+                            <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</Page>

@@ -1,0 +1,38 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:converters="clr-namespace:Petty_Cash.Converters">
+    <converters:CurrencyDisplayConverter x:Key="CurrencyDisplayConverter"/>
+    <converters:CurrencyDisplayConverter x:Key="CurrencyAllowZeroDisplayConverter" AllowZero="True"/>
+    <converters:CurrencyDisplayConverter x:Key="DisplayNoCurrency" ShowCurrency="False" AllowZero="False"/>
+    <converters:CurrencyDisplayConverter x:Key="DisplayNoCurrencyAllowZero" ShowCurrency="False" AllowZero="True"/>
+    <converters:MonthNameConverter x:Key="MonthNameConverter" />
+    <converters:OrdinalStringConverter x:Key="OrdinalStringConverter"/>
+    <converters:ObjectToBoolConverter x:Key="ObjectToBoolConverter"/>
+    <converters:HtmlToPlainTextConverter x:Key="HtmlToPlainTextConverter"/>
+    <converters:PercentDisplayConverter x:Key="PercentDisplayConverter"/>
+    <converters:TinNumberDisplayConverter x:Key="TinNumberDisplayConverter"/>
+    <converters:NegativeToBoolConverter x:Key="NegativeToBoolConverter"/>
+    <converters:CurrencyToWordsConverter x:Key="CurrencyToWordsConverter"/>
+
+    <converters:ValueConverterGroup x:Key="VisibilityValueConverter">
+        <converters:ObjectToBoolConverter/>
+        <converters:VisibilityFromBoolConverter/>
+    </converters:ValueConverterGroup>
+
+    <converters:ValueConverterGroup x:Key="VisibilityCollapsedValueConverter">
+        <converters:ObjectToBoolConverter/>
+        <converters:VisibilityFromBoolConverter HiddenValue="Collapsed"/>
+    </converters:ValueConverterGroup>
+
+    <converters:ValueConverterGroup x:Key="VisibilityValueInverseConverter">
+        <converters:ObjectToBoolConverter/>
+        <converters:BooleanlnverseConverter/>
+        <converters:VisibilityFromBoolConverter/>
+    </converters:ValueConverterGroup>
+
+    <converters:ValueConverterGroup x:Key="VisibilityCollapsedValueInverseConverter">
+        <converters:ObjectToBoolConverter/>
+        <converters:BooleanlnverseConverter/>
+        <converters:VisibilityFromBoolConverter HiddenValue="Collapsed"/>
+    </converters:ValueConverterGroup>
+</ResourceDictionary>

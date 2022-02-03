@@ -1,0 +1,109 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="billLabels.xsl"?>
+<ArrayOfBillXml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <BillXml>
+    <BillerName>GMJ Accounting Services</BillerName>
+    <Description>-</Description>
+    <CategoryName>Electricity</CategoryName>
+  </BillXml>
+  <BillXml>
+    <BillerName>MERALCO</BillerName>
+    <Description>Gahak Electricity-Unit 32H</Description>
+    <CategoryName>Electricity</CategoryName>
+  </BillXml>
+  <BillXml>
+    <BillerName>MERALCO</BillerName>
+    <Description>Gahak Electricity-Unit D</Description>
+    <CategoryName>Electricity</CategoryName>
+  </BillXml>
+  <BillXml>
+    <BillerName>MERALCO</BillerName>
+    <Description>Gahak Electricity -Unit E</Description>
+    <CategoryName>Electricity</CategoryName>
+  </BillXml>
+  <BillXml>
+    <BillerName>GLOBE TELECOM</BillerName>
+    <Description>Egate Mobile Phone-09178017253</Description>
+    <CategoryName>Mobile Phone assda asasd</CategoryName>
+  </BillXml>
+  <BillXml>
+    <BillerName>GLOBE TELECOM </BillerName>
+    <Description>Egate Mobile Phone: 09175078084</Description>
+    <CategoryName>Mobile Phone</CategoryName>
+  </BillXml>
+  <BillXml>
+    <BillerName>GLOBE TELECOM</BillerName>
+    <Description>Egate Mobile Phone: 09178548787</Description>
+    <CategoryName>Mobile Phone</CategoryName>
+  </BillXml>
+  <BillXml>
+    <BillerName>PLDT</BillerName>
+    <Description>Internet of Modory</Description>
+    <CategoryName>Internet</CategoryName>
+  </BillXml>
+  <BillXml>
+    <BillerName>PLDT</BillerName>
+    <Description>Makati Mr Kang Residential</Description>
+    <CategoryName>Internet</CategoryName>
+  </BillXml>
+  <BillXml>
+    <BillerName>Provision</BillerName>
+    <Description>-</Description>
+    <CategoryName>Electricity</CategoryName>
+  </BillXml>
+  <BillXml>
+    <BillerName>Provision</BillerName>
+    <Description>-</Description>
+    <CategoryName>Water</CategoryName>
+  </BillXml>
+  <BillXml>
+    <BillerName>Provision</BillerName>
+    <Description>-</Description>
+    <CategoryName>Janitorial</CategoryName>
+  </BillXml>
+  <BillXml>
+    <BillerName>CQM</BillerName>
+    <Description>Peza - Modory Building Rental</Description>
+    <CategoryName>Rental</CategoryName>
+  </BillXml>
+  <BillXml>
+    <BillerName>Provision</BillerName>
+    <Description>-</Description>
+    <CategoryName>Residual Waste</CategoryName>
+  </BillXml>
+  <BillXml>
+    <BillerName>JPEC BUSINESS SOLS. &amp; GEN. SERVICES INC.</BillerName>
+    <Description>Accounting Services</Description>
+    <CategoryName>Fees</CategoryName>
+  </BillXml>
+  <BillXml>
+    <BillerName>Povision</BillerName>
+    <Description />
+    <CategoryName>Fees</CategoryName>
+  </BillXml>
+  <BillXml>
+    <BillerName>Provision</BillerName>
+    <Description>-</Description>
+    <CategoryName>Fees</CategoryName>
+  </BillXml>
+  <BillXml>
+    <BillerName>Leober Legaspi</BillerName>
+    <Description>Rental Gahak- Unit D</Description>
+    <CategoryName>Rental</CategoryName>
+  </BillXml>
+  <BillXml>
+    <BillerName>GLOBE TELECOM</BillerName>
+    <Description>Modory internet w/ Phone</Description>
+    <CategoryName>Internet</CategoryName>
+  </BillXml>
+  <BillXml>
+    <BillerName>Provision</BillerName>
+    <Description>-</Description>
+    <CategoryName>Fees</CategoryName>
+  </BillXml>
+  <BillXml>
+    <BillerName>Leobar Legaspi</BillerName>
+    <Description>Rental Gahak- Unit E</Description>
+    <CategoryName>Rental</CategoryName>
+  </BillXml>
+</ArrayOfBillXml>

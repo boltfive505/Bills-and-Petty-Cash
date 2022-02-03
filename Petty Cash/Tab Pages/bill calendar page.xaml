@@ -1,0 +1,513 @@
+﻿<Page x:Class="Petty_Cash.Tab_Pages.bill_calendar_page"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:Petty_Cash.Tab_Pages"
+      xmlns:me="clr-namespace:Petty_Cash"
+      xmlns:cal="clr-namespace:bolt5.CustomMonthlyCalendar;assembly=bolt5.CustomMonthlyCalendar"
+      xmlns:billObjs="clr-namespace:Petty_Cash.Objects.Bills"
+      xmlns:submodals="clr-namespace:Petty_Cash.Sub_Modals"
+      xmlns:customs="clr-namespace:bolt5.CustomControls;assembly=bolt5.CustomControls.Wpf"
+      xmlns:objs="clr-namespace:Petty_Cash.Objects.Bills"
+      mc:Ignorable="d" 
+      d:DesignHeight="450"
+      Title="bill_calendar_page" Loaded="Page_Loaded">
+    <Grid Background="White">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="900"/>
+            <ColumnDefinition Width="1*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="100"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <!-- fiters and buttons -->
+        <StackPanel Grid.Column="0" Grid.Row="0" Orientation="Horizontal"
+                    VerticalAlignment="Top">
+            <!-- filters bill period -->
+            <GroupBox x:Name="filtersGroup" Header="Filters" Margin="0,0,50,0">
+                <StackPanel Orientation="Vertical" Margin="{StaticResource Filters.GroupBox.Margin}">
+                    <WrapPanel Orientation="Horizontal">
+                        <customs:LabelContainer Header="Biller Name" Margin="{StaticResource Filters.Fields.Margin}">
+                            <ComboBox Width="180" ItemsSource="{Binding BillerNameList}" SelectedValue="{Binding FilterBillerName,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" MaxDropDownHeight="300"/>
+                        </customs:LabelContainer>
+                        <customs:LabelContainer Header="Category" Margin="{StaticResource Filters.Fields.Margin}">
+                            <ComboBox Width="120" ItemsSource="{Binding CategoryList}" SelectedValue="{Binding FilterCategory,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Validation.ErrorTemplate="{x:Null}"
+                                      DisplayMemberPath="CategoryName" SelectedValuePath="Id" MaxDropDownHeight="300"/>
+                        </customs:LabelContainer>
+                        <customs:LabelContainer Header="Form Keyword" Margin="{StaticResource Filters.Fields.Margin}">
+                            <TextBox Width="200" Text="{Binding FilterKeyword, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                        </customs:LabelContainer>
+                        <CheckBox Content="Show Inactive" Style="{StaticResource RightCheckBox}" IsChecked="{Binding FilterInactive,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Margin="{StaticResource Filters.Fields.Margin}" VerticalAlignment="Bottom"/>
+                        <Button Content="Reset" VerticalAlignment="Bottom" Margin="{StaticResource Filters.Fields.Margin}" Click="ResetFilters_Click"/>
+                    </WrapPanel>
+                </StackPanel>
+            </GroupBox>
+            <!-- buttons -->
+            <UniformGrid Columns="1" Margin="0,10,0,0">
+                <Button Content="Register New Biller" Click="AddPeriod_btn_Click"
+                        Background="LightGreen" VerticalAlignment="Top"/>
+                <Button Content="Print Bill Label" Click="PrintBillLabel_Click"
+                        Background="SkyBlue" VerticalAlignment="Bottom"/>
+                <!-- how to add bill tooltip -->
+                <TextBlock ToolTip="{StaticResource AddBillTooltip}" FontSize="14" Margin="0,10,0,0" VerticalAlignment="Top" ToolTipService.InitialShowDelay="0" ToolTipService.ShowDuration="999999">
+                    <Hyperlink>How to Add Bill</Hyperlink>
+                    <Run Style="{StaticResource QuestionTextRunIcon}"/>
+                </TextBlock>
+            </UniformGrid>
+        </StackPanel>
+
+        <!-- filters on calendar -->
+        <Grid Grid.Column="1" Grid.Row="0" x:Name="calendarFiltersGroup" VerticalAlignment="Bottom" HorizontalAlignment="Left">
+            <StackPanel Orientation="Horizontal">
+                <StackPanel Orientation="Vertical" Margin="0,0,20,0">
+                    <TextBlock Text="Filter Keyword"/>
+                    <TextBox Width="200" Text="{Binding FilterKeyword, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                </StackPanel>
+            </StackPanel>
+        </Grid>
+        
+        <!-- biller popup -->
+        <customs:PopupModal x:Name="billerInfoPopup" Placement="Right" StaysOpen="True">
+            <Grid Margin="0,0,3,3">
+                <Grid.Effect>
+                    <DropShadowEffect/>
+                </Grid.Effect>
+                <Border BorderBrush="Gray" BorderThickness="1" Margin="0,0,3,3">
+                    <Grid Background="White">
+                        <StackPanel Orientation="Vertical">
+                            <TextBlock Text="ACCOUNT INFO" FontWeight="Bold" FontSize="14" Margin="12,5,0,0"/>
+                            <submodals:billPeriod_preview DataContext="{Binding ElementName=billerInfoPopup, Path=DataContext}"/>
+                        </StackPanel>
+                        <Button Style="{StaticResource CloseButton}" Command="{Binding ElementName=billerInfoPopup,Path=CloseCommand}"
+                            VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0,5,8,0"/>
+                    </Grid>
+                </Border>
+            </Grid>
+        </customs:PopupModal>
+        
+        <!-- period calendar list popup -->
+        <Popup x:Name="periodListPopup" IsOpen="false" StaysOpen="False" AllowsTransparency="True" Placement="Left">
+            <Grid Background="White" Margin="0,0,3,3">
+                <Grid.Effect>
+                    <DropShadowEffect/>
+                </Grid.Effect>
+                <Border BorderBrush="Gray" BorderThickness="1">
+                    <Grid Margin="10,5,10,5">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Text="{Binding ElementName=periodListPopup, Path=DataContext.Day, StringFormat={}Due bills for {0:MM/dd/yyyy}}" FontWeight="Bold"/>
+                        <ListBox Grid.Row="1" ItemsSource="{Binding ElementName=periodListPopup, Path=DataContext.Items}" BorderThickness="0">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid ToolTip="{Binding Item.Description}">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="auto"/>
+                                            <RowDefinition Height="auto"/>
+                                        </Grid.RowDefinitions>
+                                        <Button Grid.Column="0" Grid.Row="0" Grid.RowSpan="2" FontFamily="{StaticResource fontawesome-solid}" Content="{StaticResource fa-plus-circle}"
+                                                    Style="{StaticResource BorderlessButton}" Click="AddBillPayment_btn_Click"
+                                                    Foreground="DarkGreen" ToolTip="Add bill payment for this period" Margin="0,0,5,0"/>
+                                        <TextBlock Grid.Column="1" Grid.Row="0" Text="{Binding Item.BillerName}" FontSize="11" TextTrimming="CharacterEllipsis"/>
+                                        <TextBlock Grid.Column="1" Grid.Row="1" Text="{Binding Item.BillDescription}" Margin="0,-3,0,0" FontSize="10" Foreground="Gray" TextTrimming="CharacterEllipsis"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </Grid>
+                </Border>
+            </Grid>
+        </Popup>
+
+        <!-- bill list -->
+        <DataGrid x:Name="billPeriodDg" Grid.Column="0" Grid.Row="1" Margin="0,31,20,0">
+            <DataGrid.CellStyle>
+                <Style TargetType="{x:Type DataGridCell}" BasedOn="{StaticResource DataGridCell.Style.Default}">
+                    <Setter Property="Foreground" Value="Black"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsActive}" Value="False">
+                            <Setter Property="Foreground" Value="DarkGray"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </DataGrid.CellStyle>
+            <DataGrid.Columns>
+                <DataGridTemplateColumn>
+                    <DataGridTemplateColumn.CellStyle>
+                        <Style TargetType="{x:Type DataGridCell}" BasedOn="{StaticResource DataGridCell.Style.Default}">
+                            <Setter Property="Visibility" Value="Hidden"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType={x:Type DataGridRow}},Path=IsMouseOver}" Value="True">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </DataGridTemplateColumn.CellStyle>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button FontFamily="{StaticResource fontawesome-solid}" Content="{StaticResource fa-pen}"
+                                        Style="{StaticResource BorderlessButton}" Click="EditPeriod_btn_Click"
+                                        Foreground="Silver" ToolTip="Edit billing period"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Header="Biller Name" Width="120" SortMemberPath="BillerName">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button Content="{Binding BillerName}" Click="BillerInfo_btn_Click"
+                                    Style="{StaticResource LinkButton}" Margin="{StaticResource DataGridTextCell.Margin}"
+                                    ToolTip="{Binding Description}"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Header="Short Description" Width="150" SortMemberPath="BillDescription">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button Content="{Binding BillDescription}" ToolTip="{Binding Description}" Style="{StaticResource LinkButton}" Click="SelectBill_btn_Click" Margin="{StaticResource DataGridTextCell.Margin}"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <!-- missing due date bills count -->
+                <DataGridTextColumn>
+                    <DataGridTextColumn.Header>
+                        <TextBlock Style="{StaticResource QuestionTextIcon}" ToolTip="Bill not updated for this year, as of today"/>
+                    </DataGridTextColumn.Header>
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Center}">
+                            <Setter Property="Text" Value="X"/>
+                            <Setter Property="Foreground" Value="Red"/>
+                            <Setter Property="FontWeight" Value="Bold"/>
+                            <Setter Property="Visibility" Value="Visible"/>
+                            <Setter Property="ToolTip">
+                                <Setter.Value>
+                                    <StackPanel Orientation="Vertical">
+                                        <StackPanel.Style>
+                                            <Style TargetType="{x:Type StackPanel}">
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding MissingBillsByDueDate.Count}" Value="0">
+                                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </StackPanel.Style>
+                                        <TextBlock Text="Check Bills for these Periods:" FontWeight="Bold" Foreground="Red"/>
+                                        <ItemsControl ItemsSource="{Binding MissingBillsByDueDate}">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <TextBlock Text="{Binding StringFormat={}{0:MM/dd/yyyy}}" TextAlignment="Left"/>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </StackPanel>
+                                </Setter.Value>
+                            </Setter>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding MissingBillsByDueDate.Count}" Value="0">
+                                    <Setter Property="Visibility" Value="Hidden"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <!-- bills amount missing count -->
+                <DataGridTemplateColumn SortMemberPath="MissingBillsAmountFile.Count">
+                    <DataGridTemplateColumn.Header>
+                        <TextBlock>
+                            <Run>B</Run>
+                            <Run Style="{StaticResource QuestionTextRunIcon}" ToolTip="Missing Bill Amount &amp; File"/>
+                        </TextBlock>
+                    </DataGridTemplateColumn.Header>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button Content="?" Margin="{StaticResource DataGridTextCell.Margin}" IsEnabled="False" ToolTipService.ShowOnDisabled="True" IsHitTestVisible="True" Foreground="White" Background="Red" FontWeight="Bold">
+                                <Button.Style>
+                                    <Style TargetType="{x:Type Button}" BasedOn="{StaticResource SquareButton}">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                        <Setter Property="ToolTip">
+                                            <Setter.Value>
+                                                <StackPanel Orientation="Vertical">
+                                                    <TextBlock Text="Check Bills Amount &amp; File for these due dates:" FontWeight="Bold" Foreground="Red"/>
+                                                    <ItemsControl ItemsSource="{Binding MissingBillsAmountFile}">
+                                                        <ItemsControl.ItemTemplate>
+                                                            <DataTemplate>
+                                                                <TextBlock Text="{Binding StringFormat={}{0:MM/dd/yyyy}}" TextAlignment="Left"/>
+                                                            </DataTemplate>
+                                                        </ItemsControl.ItemTemplate>
+                                                    </ItemsControl>
+                                                </StackPanel>
+                                            </Setter.Value>
+                                        </Setter>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding MissingBillsAmountFile.Count}" Value="0">
+                                                <Setter Property="Visibility" Value="Hidden"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                            </Button>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <!-- payment amount missing count -->
+                <DataGridTemplateColumn SortMemberPath="MissingReceiptAmountFile.Count">
+                    <DataGridTemplateColumn.Header>
+                        <TextBlock>
+                            <Run>P</Run>
+                            <Run Style="{StaticResource QuestionTextRunIcon}" ToolTip="Missing Payment Amount &amp; File"/>
+                        </TextBlock>
+                    </DataGridTemplateColumn.Header>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button Content="?" Margin="{StaticResource DataGridTextCell.Margin}" IsEnabled="False" ToolTipService.ShowOnDisabled="True" IsHitTestVisible="True" Foreground="White" Background="Red" FontWeight="Bold">
+                                <Button.Style>
+                                    <Style TargetType="{x:Type Button}" BasedOn="{StaticResource SquareButton}">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                        <Setter Property="ToolTip">
+                                            <Setter.Value>
+                                                <StackPanel Orientation="Vertical">
+                                                    <TextBlock Text="Check Payment Amount &amp; File for these due dates:" FontWeight="Bold" Foreground="Red"/>
+                                                    <ItemsControl ItemsSource="{Binding MissingReceiptAmountFile}">
+                                                        <ItemsControl.ItemTemplate>
+                                                            <DataTemplate>
+                                                                <TextBlock Text="{Binding StringFormat={}{0:MM/dd/yyyy}}" TextAlignment="Left"/>
+                                                            </DataTemplate>
+                                                        </ItemsControl.ItemTemplate>
+                                                    </ItemsControl>
+                                                </StackPanel>
+                                            </Setter.Value>
+                                        </Setter>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding MissingReceiptAmountFile.Count}" Value="0">
+                                                <Setter Property="Visibility" Value="Hidden"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                            </Button>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Header="Account No." Binding="{Binding AccountNumber}" ElementStyle="{StaticResource DataGridTextColumn.ElementStyle.Left}"/>
+                <DataGridTextColumn Header="Account Name" Binding="{Binding AccountName}" ElementStyle="{StaticResource DataGridTextColumn.ElementStyle.Left}"/>
+                <DataGridTemplateColumn Header="Pay">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Grid Style="{StaticResource DataGridCell.GridStyle.ShowOnHover}" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="{StaticResource DataGridTextCell.Margin}">
+                                <Button FontFamily="{StaticResource fontawesome-solid}" Content="{StaticResource fa-plus-circle}" Style="{StaticResource BorderlessButton}" FontSize="14" Foreground="DarkGreen"
+                                        Click="AddBillPayment_btn_Click" ToolTip="Add bill payment"/>
+                            </Grid>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Header="Category" Binding="{Binding Category.CategoryName}" Width="100">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Left}">
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <DataGridTextColumn Header="VAT" Binding="{Binding TaxRate, Converter={StaticResource PercentDisplayConverter}}">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Right}">
+                            <Setter Property="Visibility" Value="Hidden"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding TaxType}" Value="{x:Static me:BillTaxType.Vat}">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <DataGridTextColumn Header="WHT" Binding="{Binding TaxRate, Converter={StaticResource PercentDisplayConverter}}">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Right}">
+                            <Setter Property="Visibility" Value="Hidden"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding TaxType}" Value="{x:Static me:BillTaxType.Withholding_Tax}">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <DataGridTextColumn Header="Tin No." Binding="{Binding TinNumber}" ElementStyle="{StaticResource DataGridTextColumn.ElementStyle.Left}"/>
+                <DataGridTemplateColumn Header="Video">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button FontFamily="{StaticResource fontawesome-solid}" Content="{StaticResource fa-film}" Style="{StaticResource BorderlessButton}"
+                                    Visibility="{Binding VideoInstructionsFile, Converter={StaticResource VisibilityValueConverter}}"
+                                    Click="OpenVideo_btn_Click"
+                                    FontSize="14" Foreground="SteelBlue" ToolTip="{Binding VideoInstructionsFile, StringFormat={}Click to open video: {0}}" Tag="{Binding VideoInstructionsFile}"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Header="File">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button FontFamily="{StaticResource fontawesome-solid}" Content="{StaticResource fa-file}" Style="{StaticResource BorderlessButton}"
+                                    Visibility="{Binding ContractFile, Converter={StaticResource VisibilityValueConverter}}"
+                                    Click="OpenContract_btn_Click"
+                                    Foreground="#f4c43b" ToolTip="{Binding ContractFile, StringFormat={}Click to open contract: {0}}" Tag="{Binding ContractFile}"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Header="Period Type" SortMemberPath="PeriodType" Width="100">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="{StaticResource DataGridTextCell.Margin}">
+                                <TextBlock Text="{Binding PeriodType}"/>
+                                <TextBlock FontFamily="{StaticResource fontawesome-solid}" Text="{StaticResource fa-ban}"
+                                               Visibility="{Binding HasExclusion, Converter={StaticResource VisibilityCollapsedValueConverter}}"
+                                               Foreground="Red" VerticalAlignment="Center" Margin="3,0,0,0">
+                                    <TextBlock.ToolTip>
+                                        <Grid>
+                                            <!-- start excluded months -->
+                                            <StackPanel Orientation="Vertical">
+                                                <StackPanel.Style>
+                                                    <Style TargetType="{x:Type StackPanel}">
+                                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding PeriodType}" Value="{x:Static me:BillPeriodType.Monthly}">
+                                                                <Setter Property="Visibility" Value="Visible"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </StackPanel.Style>
+                                                <TextBlock Text="Excluded Month/s:" FontWeight="Bold" Foreground="Red"/>
+                                                <ItemsControl ItemsSource="{Binding MonthInclusionList}">
+                                                    <ItemsControl.ItemTemplate>
+                                                        <DataTemplate DataType="{x:Type billObjs:BillPeriodInclusionViewModel}">
+                                                            <TextBlock Text="{Binding Value, Converter={StaticResource MonthNameConverter}}">
+                                                                <TextBlock.Style>
+                                                                    <Style TargetType="{x:Type TextBlock}">
+                                                                        <Setter Property="Visibility" Value="Visible"/>
+                                                                        <Style.Triggers>
+                                                                            <DataTrigger Binding="{Binding IsIncluded}" Value="True">
+                                                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                                                            </DataTrigger>
+                                                                        </Style.Triggers>
+                                                                    </Style>
+                                                                </TextBlock.Style>
+                                                            </TextBlock>
+                                                        </DataTemplate>
+                                                    </ItemsControl.ItemTemplate>
+                                                </ItemsControl>
+                                            </StackPanel>
+                                            <!-- end excluded months -->
+                                            <!-- start excluded quarters -->
+                                            <StackPanel Orientation="Vertical">
+                                                <StackPanel.Style>
+                                                    <Style TargetType="{x:Type StackPanel}">
+                                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding PeriodType}" Value="{x:Static me:BillPeriodType.EndOfQuarter}">
+                                                                <Setter Property="Visibility" Value="Visible"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </StackPanel.Style>
+                                                <TextBlock Text="Excluded Quarter/s:" FontWeight="Bold" Foreground="Red"/>
+                                                <ItemsControl ItemsSource="{Binding QuarterInclusionList}">
+                                                    <ItemsControl.ItemTemplate>
+                                                        <DataTemplate DataType="{x:Type billObjs:BillPeriodInclusionViewModel}">
+                                                            <TextBlock Text="{Binding Value, Converter={StaticResource OrdinalStringConverter}, StringFormat={}{0} Quarter}">
+                                                                <TextBlock.Style>
+                                                                    <Style TargetType="{x:Type TextBlock}">
+                                                                        <Setter Property="Visibility" Value="Visible"/>
+                                                                        <Style.Triggers>
+                                                                            <DataTrigger Binding="{Binding IsIncluded}" Value="True">
+                                                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                                                            </DataTrigger>
+                                                                        </Style.Triggers>
+                                                                    </Style>
+                                                                </TextBlock.Style>
+                                                            </TextBlock>
+                                                        </DataTemplate>
+                                                    </ItemsControl.ItemTemplate>
+                                                </ItemsControl>
+                                            </StackPanel>
+                                            <!-- end excluded qurters -->
+                                        </Grid>
+                                    </TextBlock.ToolTip>
+                                    </TextBlock>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Header="Due Date" Binding="{Binding DueDateStr}" ElementStyle="{StaticResource DataGridTextColumn.ElementStyle.Right}"/>
+                <DataGridTextColumn Header="Expiration" Binding="{Binding ContractExpiration, StringFormat=d}">
+                    <DataGridTextColumn.HeaderStyle>
+                        <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource DataGridColumnHeader.Right}"/>
+                    </DataGridTextColumn.HeaderStyle>
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Right}">
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <DataGridTextColumn Header="Contact Person" Binding="{Binding ContactPerson}" ElementStyle="{StaticResource DataGridTextColumn.ElementStyle.Left}"/>
+                <DataGridTextColumn Header="Contact No." Binding="{Binding ContactNumber}" ElementStyle="{StaticResource DataGridTextColumn.ElementStyle.Left}"/>
+                <DataGridTextColumn Header="Address" Binding="{Binding Address}" ElementStyle="{StaticResource DataGridTextColumn.ElementStyle.Left}"/>
+                <DataGridTextColumn Header="Unit No." Binding="{Binding UnitNumber}">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Left}">
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <DataGridTextColumn Header="Phone No." Binding="{Binding PhoneNumber}">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Left}">
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <DataGridTextColumn Header="Contract Amount" Binding="{Binding ContractAmount, Converter={StaticResource CurrencyAllowZeroDisplayConverter}}">
+                    <DataGridTextColumn.HeaderStyle>
+                        <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource DataGridColumnHeader.Right}"/>
+                    </DataGridTextColumn.HeaderStyle>
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Right}">
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+        <!-- calendar view -->
+        <cal:MonthlyCalendar x:Name="billCalendar" Grid.Column="1" Grid.Row="1"
+                                 DisplayMonthChanged="billCalendar_DisplayMonthChanged" DayClick="billCalendar_DayClick" Style="{DynamicResource MonthlyCalendarStyle1}">
+            <cal:MonthlyCalendar.BindingTemplate>
+                <DataTemplate>
+                    <Grid>
+                        <ListBox ItemsSource="{Binding Items}" Background="Transparent" 
+                                 ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid ToolTip="{Binding Item.Description}">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="auto"/>
+                                            <RowDefinition Height="auto"/>
+                                        </Grid.RowDefinitions>
+                                        <Button Grid.Column="0" Grid.Row="0" Grid.RowSpan="2" FontFamily="{StaticResource fontawesome-solid}" Content="{StaticResource fa-plus-circle}"
+                                                    Style="{StaticResource BorderlessButton}" Click="AddBillPayment_btn_Click"
+                                                    Foreground="DarkGreen" ToolTip="Add bill payment for this period" Margin="0,0,5,0"/>
+                                        <TextBlock Grid.Column="1" Grid.Row="0" Text="{Binding Item.BillerName}" FontSize="11" TextTrimming="CharacterEllipsis"/>
+                                        <TextBlock Grid.Column="1" Grid.Row="1" Text="{Binding Item.BillDescription}" Margin="0,-3,0,0" FontSize="10" Foreground="Gray" TextTrimming="CharacterEllipsis"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </Grid>
+                </DataTemplate>
+            </cal:MonthlyCalendar.BindingTemplate>
+        </cal:MonthlyCalendar>
+    </Grid>
+</Page>

@@ -1,0 +1,152 @@
+﻿<UserControl x:Class="Petty_Cash.Sub_Modals.pettyCashAdminAddEdit_modal"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Petty_Cash.Sub_Modals"
+             xmlns:objs="clr-namespace:Petty_Cash.Objects"
+             xmlns:xceed="clr-namespace:Xceed.Wpf.Toolkit;assembly=Xceed.Wpf.Toolkit"
+             xmlns:customs="clr-namespace:bolt5.CustomControls;assembly=bolt5.CustomControls.Wpf"
+             xmlns:converters="clr-namespace:Petty_Cash.Converters"
+             mc:Ignorable="d" 
+             Loaded="UserControl_Loaded">
+    <UserControl.Resources>
+        <converters:MultiValueNumberOperationConverter x:Key="PettyCashBalance" Operation="Subtract"/>
+        <Style x:Key="DisabledTextbox" TargetType="{x:Type TextBox}">
+            <Setter Property="IsReadOnly" Value="True"/>
+            <Setter Property="Background" Value="WhiteSmoke"/>
+            <Setter Property="IsTabStop" Value="False"/>
+            <Setter Property="MinHeight" Value="21"/>
+        </Style>
+        <Style x:Key="DisabledDecimalUpDown" TargetType="{x:Type xceed:DecimalUpDown}">
+            <Setter Property="IsReadOnly" Value="True"/>
+            <Setter Property="Background" Value="WhiteSmoke"/>
+            <Setter Property="IsTabStop" Value="False"/>
+            <Setter Property="ShowButtonSpinner" Value="False"/>
+            <Setter Property="MinHeight" Value="21"/>
+        </Style>
+        <Style x:Key="CompanyInfo" TargetType="{x:Type TextBox}">
+            <Setter Property="IsReadOnly" Value="True"/>
+            <Setter Property="Background" Value="WhiteSmoke"/>
+            <Setter Property="IsTabStop" Value="False"/>
+            <Setter Property="MinHeight" Value="21"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding ElementName=TinNumberValue, Path=SelectedItem}" Value="{x:Null}">
+                    <Setter Property="IsReadOnly" Value="False"/>
+                    <Setter Property="Background" Value="Transparent"/>
+                    <Setter Property="IsTabStop" Value="True"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
+    <Grid Background="White">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="auto"/>
+        </Grid.ColumnDefinitions>
+        <StackPanel Grid.Column="0" Orientation="Vertical" Margin="{StaticResource SubModal.Group.Margin}">
+            <StackPanel Orientation="Horizontal" Margin="{StaticResource SubModal.Verticals.Margin}">
+                <StackPanel Orientation="Vertical" Margin="{StaticResource SubModal.Fields.Margin}">
+                    <TextBlock Text="Payee"/>
+                    <TextBox Text="{Binding Payee.PayeeName,Mode=OneWay}" Style="{StaticResource DisabledTextbox}" Width="200"/>
+                </StackPanel>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="{StaticResource SubModal.Verticals.Margin}">
+                <StackPanel Orientation="Vertical" Margin="{StaticResource SubModal.Fields.Margin}">
+                    <TextBlock Text="Tin Number"/>
+                    <StackPanel Orientation="Horizontal">
+                        <ComboBox x:Name="TinNumberValue" Width="120" SelectedItem="{Binding Company,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged,ValidatesOnExceptions=True,ValidatesOnDataErrors=True}"
+                                  IsEditable="True" IsTextSearchCaseSensitive="False" IsTextSearchEnabled="True" TextSearch.TextPath="TinNumber" TextBoxBase.TextChanged="TinNumberValue_TextChanged" SelectionChanged="TinNumberValue_SelectionChanged">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate DataType="{x:Type objs:CompanyViewModel}">
+                                    <StackPanel Orientation="Vertical">
+                                        <TextBlock>
+                                            <Run Text="{Binding TinNumber, Converter={StaticResource TinNumberDisplayConverter}}"/>
+                                            <Run Text="{Binding CompanyName, StringFormat={}- {0}}" Foreground="Gray"/>
+                                        </TextBlock>
+                                        <TextBlock Text="{Binding Address}" Foreground="Gray" FontStyle="Italic"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                    </StackPanel>
+                </StackPanel>
+                <StackPanel Orientation="Vertical" Margin="{StaticResource SubModal.Fields.Margin}">
+                    <TextBlock Text="Company"/>
+                    <TextBox x:Name="CompanyValue" Width="150">
+                        <TextBox.Style>
+                            <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource CompanyInfo}"/>
+                        </TextBox.Style>
+                    </TextBox>
+                </StackPanel>
+                <StackPanel Orientation="Vertical" Margin="{StaticResource SubModal.Fields.Margin}">
+                    <TextBlock Text="Address"/>
+                    <TextBox x:Name="AddressValue" Width="200">
+                        <TextBox.Style>
+                            <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource CompanyInfo}"/>
+                        </TextBox.Style>
+                    </TextBox>
+                </StackPanel>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="{StaticResource SubModal.Verticals.Margin}">
+                <StackPanel Orientation="Vertical" Margin="{StaticResource SubModal.Fields.Margin}">
+                    <TextBlock Text="Amount"/>
+                    <xceed:DecimalUpDown x:Name="AmountValue" Value="{Binding AmountOut,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+                                         ShowButtonSpinner="False" FormatString="N2" Width="100"/>
+                </StackPanel>
+                <StackPanel Orientation="Vertical" Margin="{StaticResource SubModal.Fields.Margin}">
+                    <TextBlock Text="VAT"/>
+                    <CheckBox x:Name="IsVatValue" IsChecked="{Binding IsVat, UpdateSourceTrigger=PropertyChanged}"
+                              Style="{StaticResource BigCheckBox}" Height="20"/>
+                </StackPanel>
+                <StackPanel Orientation="Vertical" Margin="{StaticResource SubModal.Fields.Margin}">
+                    <TextBlock Text="VAT (12%)"/>
+                    <xceed:DecimalUpDown Value="{Binding VatAmount, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                         Style="{StaticResource DisabledDecimalUpDown}" Width="70"/>
+                </StackPanel>
+                <StackPanel Orientation="Vertical" Margin="{StaticResource SubModal.Fields.Margin}">
+                    <TextBlock Text="Net of VAT"/>
+                    <xceed:DecimalUpDown Value="{Binding NetVatAmount, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                         Style="{StaticResource DisabledDecimalUpDown}" Width="70"/>
+                </StackPanel>
+                <StackPanel Orientation="Vertical" Margin="{StaticResource SubModal.Fields.Margin}">
+                    <TextBlock Text="Non-VAT"/>
+                    <xceed:DecimalUpDown Value="{Binding NonVatAmount, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                         Style="{StaticResource DisabledDecimalUpDown}" Width="70"/>
+                </StackPanel>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="{StaticResource SubModal.Verticals.Margin}">
+                <StackPanel Orientation="Vertical" Margin="{StaticResource SubModal.Fields.Margin}">
+                    <TextBlock Text="Category"/>
+                    <StackPanel Orientation="Horizontal">
+                        <ComboBox x:Name="CategoryValue" Width="150" DisplayMemberPath="CategoryName"
+                                  IsEditable="True" IsTextSearchCaseSensitive="False" IsTextSearchEnabled="True" TextSearch.TextPath="CategoryName"
+                                  SelectedItem="{Binding Category,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                    </StackPanel>
+                </StackPanel>
+                <StackPanel Orientation="Vertical" Margin="{StaticResource SubModal.Fields.Margin}">
+                    <TextBlock Text="Date"/>
+                    <xceed:DateTimePicker x:Name="DateValue" Value="{Binding TransactionDate, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+                                          ShowButtonSpinner="False" TimePickerVisibility="Collapsed" Format="ShortDate" Width="100"/>
+                </StackPanel>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="{StaticResource SubModal.Verticals.Margin}">
+                <StackPanel Orientation="Vertical" Margin="{StaticResource SubModal.Fields.Margin}">
+                    <TextBlock Text="Purpose ( Particulars )"/>
+                    <TextBox x:Name="PurposeValue" Text="{Binding Purpose, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" 
+                             Width="500" Height="45"/>
+                </StackPanel>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="{StaticResource SubModal.Verticals.Margin}">
+                <StackPanel Orientation="Vertical" Margin="{StaticResource SubModal.Fields.Margin}">
+                    <TextBlock Text="Payment File"/>
+                    <StackPanel Orientation="Horizontal">
+                        <customs:FileAttachment x:Name="PaymentFileValue" FileName="{Binding PaymentFile, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" 
+                                            Width="350" Filter="Supported Files|*.pdf;*.png;*.jpg;*.jpeg"/>
+                        <Button Content="Open Camera" Click="OpenCamera_btn_Click" Margin="5,0,0,0"/>
+                    </StackPanel>
+                </StackPanel>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</UserControl>

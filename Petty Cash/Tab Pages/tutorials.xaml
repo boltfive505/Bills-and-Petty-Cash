@@ -1,0 +1,335 @@
+﻿<Page x:Class="Petty_Cash.Tab_Pages.tutorials"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:Petty_Cash.Tab_Pages"
+      xmlns:converters="clr-namespace:Petty_Cash.Converters"
+      xmlns:html="clr-namespace:bolt5.CustomHtmlCefEditor;assembly=bolt5.CustomHtmlCefEditor"
+      mc:Ignorable="d" 
+      d:DesignHeight="450" d:DesignWidth="800"
+      Title="tutorials" Loaded="Page_Loaded">
+    <Page.Resources>
+        <converters:BitmapImageConverter x:Key="BitmapImageConverterFull"/>
+        <converters:HierarchyMarginConverter x:Key="HierarchyMarginConverter" Multiplier="20"/>
+        <Style x:Key="FileButtonStyle" TargetType="{x:Type Button}" BasedOn="{StaticResource BorderlessButton}">
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="FontFamily" Value="{StaticResource fontawesome-solid}"/>
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="Margin" Value="5,0,5,0"/>
+            <Setter Property="IsHitTestVisible" Value="True"/>
+            <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Self},Path=Tag}"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=Tag, Converter={StaticResource ObjectToBoolConverter}}" Value="False">
+                    <Setter Property="IsHitTestVisible" Value="False"/>
+                    <Setter Property="Foreground" Value="Silver"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="RawVideoButtonStyle" TargetType="{x:Type Button}" BasedOn="{StaticResource FileButtonStyle}">
+            <Setter Property="Content" Value="{StaticResource fa-film}"/>
+            <Setter Property="Foreground" Value="#3b81c0"/>
+        </Style>
+        <Style x:Key="FileAttachmentButtonStyle" TargetType="{x:Type Button}" BasedOn="{StaticResource FileButtonStyle}">
+            <Setter Property="Content" Value="{StaticResource fa-file}"/>
+            <Setter Property="Foreground" Value="#fcca3d"/>
+        </Style>
+        <Style x:Key="YoutubeLinkButtonStyle" TargetType="{x:Type Button}" BasedOn="{StaticResource FileButtonStyle}">
+            <Setter Property="FontFamily" Value="{StaticResource fontawesome-brand}"/>
+            <Setter Property="Content" Value="{StaticResource fa-youtube}"/>
+            <Setter Property="Foreground" Value="red"/>
+        </Style>
+    </Page.Resources>
+    <Grid Background="White">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="80"/>
+            <RowDefinition Height="300"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="300"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <!-- buttons -->
+        <StackPanel Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" Orientation="Horizontal" VerticalAlignment="Top" HorizontalAlignment="Left">
+            <Button Content="Add Category" Click="AddCategory_Click"/>
+            <Button Content="Add Video" Click="AddVideo_Click" Margin="10,0,0,0"/>
+        </StackPanel>
+        <!-- category expand / collapse buttons -->
+        <StackPanel Grid.Column="0" Grid.Row="0" Orientation="Horizontal" VerticalAlignment="Bottom" HorizontalAlignment="Left">
+            <Button Content="Expand All" Click="ExpandAll_btn_Click" Style="{StaticResource LinkButton}" FontStyle="Italic" Margin="0,0,10,0"/>
+            <Button Content="Collapse All" Click="CollapseAll_btn_Click" Style="{StaticResource LinkButton}" FontStyle="Italic"/>
+        </StackPanel>
+        <!-- show inactive -->
+        <StackPanel x:Name="filtersCategoryGroup" Grid.Column="0" Grid.Row="0" Orientation="Horizontal" VerticalAlignment="Bottom" HorizontalAlignment="Right">
+            <CheckBox Content="Show InActive" IsChecked="{Binding ShowInactiveCategory,UpdateSourceTrigger=PropertyChanged}"/>
+        </StackPanel>
+        <!-- category list -->
+        <GroupBox Grid.Column="0" Grid.Row="1" Grid.RowSpan="2">
+            <GroupBox.Header>
+                <TextBlock Text="CATEGORIES" FontWeight="Bold"/>
+            </GroupBox.Header>
+            <DataGrid x:Name="categoryDataGrid" HeadersVisibility="None" CanUserSortColumns="False" GridLinesVisibility="Horizontal"
+                      SelectedValuePath="Id">
+                <DataGrid.RowStyle>
+                    <Style TargetType="{x:Type DataGridRow}" BasedOn="{StaticResource DataGridRow.Style.Default}">
+                        <EventSetter Event="Selected" Handler="CategoryRow_Selected"/>
+                        <Setter Property="Visibility" Value="Visible"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsCategoryVisible}" Value="False">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </DataGrid.RowStyle>
+                <DataGrid.Columns>
+                    <DataGridTemplateColumn Width="*">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Grid Margin="{StaticResource DataGridTextCell.Margin}">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Expander Grid.Column="0" 
+                                              IsExpanded="{Binding IsCategoryExpanded,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+                                              IsEnabled="{Binding HasCategoryChildren,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+                                              Style="{StaticResource PlusMinusExpander}"
+                                              Margin="{Binding HierarchyLevel, Converter={StaticResource HierarchyMarginConverter}}"
+                                              HorizontalAlignment="Left" ToolTip="{Binding Description}"/>
+                                    <TextBlock Grid.Column="1" Text="{Binding CategoryName}" TextTrimming="CharacterEllipsis">
+                                        <TextBlock.Style>
+                                            <Style TargetType="{x:Type TextBlock}">
+                                                <Setter Property="Foreground" Value="Black"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsActive}" Value="False">
+                                                        <Setter Property="Foreground" Value="Silver"/>
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding IsActiveHierarchy}" Value="False">
+                                                        <Setter Property="Foreground" Value="Silver"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </Grid>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTextColumn Binding="{Binding VideoCount}">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Center}">
+                                <Setter Property="Foreground" Value="Gray"/>
+                                <Setter Property="ToolTip" Value="Video Count"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <DataGridTemplateColumn Width="43">
+                        <DataGridTemplateColumn.CellStyle>
+                            <Style TargetType="{x:Type DataGridCell}" BasedOn="{StaticResource DataGridCell.Style.Default}">
+                                <Setter Property="Visibility" Value="Hidden"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType={x:Type DataGridRow}},Path=IsMouseOver}" Value="True">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </DataGridTemplateColumn.CellStyle>
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <!-- add video -->
+                                    <Button Style="{StaticResource BorderlessButton}" Click="AddVideo_Click"
+                                            FontFamily="{StaticResource fontawesome-solid}" Content="{StaticResource fa-plus}" Foreground="DarkGreen"
+                                            ToolTip="Click to add video for this category" Margin="3,0,3,0"/>
+                                    <!-- edit category -->
+                                    <Button Style="{StaticResource BorderlessButton}" Click="EditCategory_btn_Click"
+                                            FontFamily="{StaticResource fontawesome-solid}" Content="{StaticResource fa-edit}" Foreground="Navy"
+                                            ToolTip="Click to edit category" Margin="3,0,3,0"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+        </GroupBox>
+        <!-- video filters -->
+        <GroupBox x:Name="filtersGroup" Grid.Column="1" Grid.Row="0" Header="Filters" Margin="10,0,0,0" VerticalAlignment="Top" HorizontalAlignment="Left">
+            <StackPanel Orientation="Horizontal" Margin="8">
+                <TextBlock Text="Description" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                <TextBox Text="{Binding FilterDescription,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Width="200"/>
+            </StackPanel>
+        </GroupBox>
+        <!-- video list -->
+        <GroupBox Grid.Column="1" Grid.Row="1" Margin="10,0,0,0">
+            <GroupBox.Header>
+                <TextBlock>
+                    <Run FontWeight="Bold">VIDEO LIST</Run>
+                    <Run FontFamily="{StaticResource fontawesome-solid}" Text="{StaticResource fa-question-circle}" Foreground="SteelBlue" FontSize="16" ToolTipService.InitialShowDelay="0" ToolTipService.ShowDuration="99999">
+                        <Run.ToolTip>
+                            <TextBlock FontSize="14" MaxWidth="600" TextWrapping="Wrap">
+                                <Run FontWeight="Bold" Foreground="Red">General Guide of using the Tutorials:</Run><LineBreak/>
+                                • For Short Description -> put "0" in front, so that it goes to the top (alphabetical order) -> this is for <Run FontWeight="Bold">General View of the process</Run> including attaching excel file.<LineBreak/><LineBreak/>
+                                • If you will add tutorials with <Run>multiple steps</Run> -> put a number in front, starting from "1" -> so it will sort properly (alphabetical order).
+                            </TextBlock>
+                        </Run.ToolTip>
+                    </Run>
+                </TextBlock>
+            </GroupBox.Header>
+            <DataGrid x:Name="videoDataGrid" HeadersVisibility="Column">
+                <DataGrid.RowStyle>
+                    <Style TargetType="{x:Type DataGridRow}" BasedOn="{StaticResource DataGridRow.Style.Default}">
+                        <EventSetter Event="Selected" Handler="VideoRow_Selected"/>
+                    </Style>
+                </DataGrid.RowStyle>
+                <DataGrid.Columns>
+                    <DataGridTemplateColumn Width="25">
+                        <DataGridTemplateColumn.CellStyle>
+                            <Style TargetType="{x:Type DataGridCell}" BasedOn="{StaticResource DataGridCell.Style.Default}">
+                                <Setter Property="Visibility" Value="Hidden"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType={x:Type DataGridRow}}, Path=IsMouseOver}" Value="True">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </DataGridTemplateColumn.CellStyle>
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button Style="{StaticResource BorderlessButton}" FontFamily="{StaticResource fontawesome-solid}" Content="{StaticResource fa-edit}"
+                                        Foreground="Navy" Click="EditVideo_Click" ToolTip="Click to edit video"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTextColumn Header="Short Description" Binding="{Binding ShortDescription, Converter={StaticResource HtmlToPlainTextConverter}}" MinWidth="200" MaxWidth="300">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Left}">
+                                <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="Long Description" Binding="{Binding LongDescription, Converter={StaticResource HtmlToPlainTextConverter}}" MinWidth="300" MaxWidth="400">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Left}">
+                                <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="Category" Binding="{Binding Category.CategoryName}" ElementStyle="{StaticResource DataGridTextColumn.ElementStyle.Left}">
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="Level" Binding="{Binding EntryLevel}" ElementStyle="{StaticResource DataGridTextColumn.ElementStyle.Left}">
+                    </DataGridTextColumn>
+                    <DataGridTemplateColumn Header="Raw Video Files" Width="100" HeaderStyle="{StaticResource DataGridColumnHeader.Center}">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                    <Button Style="{StaticResource RawVideoButtonStyle}" Tag="{Binding RawVideoFile1}" Click="OpenRawVideo_btn_Click"/>
+                                    <Button Style="{StaticResource RawVideoButtonStyle}" Tag="{Binding RawVideoFile2}" Click="OpenRawVideo_btn_Click"/>
+                                    <Button Style="{StaticResource RawVideoButtonStyle}" Tag="{Binding RawVideoFile3}" Click="OpenRawVideo_btn_Click"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn Header="File" Width="40" HeaderStyle="{StaticResource DataGridColumnHeader.Center}">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button Style="{StaticResource FileAttachmentButtonStyle}" Tag="{Binding FileAttachment}" Click="OpenFileAttachment_btn_Click"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn Header="Youtube" Width="55"  HeaderStyle="{StaticResource DataGridColumnHeader.Center}">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button Style="{StaticResource YoutubeLinkButtonStyle}" Tag="{Binding YoutubeUrlLink}" Click="OpenYoutubeLink_btn_Click"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTextColumn Header="Scheduled" Binding="{Binding PeriodDescription}" ElementStyle="{StaticResource DataGridTextColumn.ElementStyle.Left}">
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="Schedule Name" Binding="{Binding PeriodName}" ElementStyle="{StaticResource DataGridTextColumn.ElementStyle.Left}">
+                    </DataGridTextColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+        </GroupBox>
+        <!-- video details -->
+        <GroupBox Grid.Column="1" Grid.Row="2" Margin="10,10,0,0" DataContext="{Binding ElementName=videoDataGrid,Path=SelectedItem}">
+            <GroupBox.Header>
+                <TextBlock Text="VIDEO DETAILS" FontWeight="Bold" Foreground="OrangeRed"/>
+            </GroupBox.Header>
+            <Grid Margin="10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <!-- video -->
+                <Grid Grid.Column="0" Grid.Row="0" Grid.RowSpan="2" Width="320" Height="200" Margin="0,0,20,20" Background="Silver" VerticalAlignment="Top">
+                    <Button ToolTip="Click to play video" Click="OpenVideo_btn_Click" Cursor="Hand">
+                        <Button.Style>
+                            <Style TargetType="{x:Type Button}">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="{x:Type Button}">
+                                            <Grid>
+                                                <Border BorderBrush="DarkGray" BorderThickness="1">
+                                                    <Image Source="{Binding ThumbnailFullPath, Converter={StaticResource BitmapImageConverterFull}}"/>
+                                                </Border>
+                                                <Grid>
+                                                    <Grid.Background>
+                                                        <SolidColorBrush Color="Black" Opacity="0.2"/>
+                                                    </Grid.Background>
+                                                    <TextBlock FontFamily="{StaticResource fontawesome-solid}" Text="{StaticResource fa-play}" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="60"/>
+                                                </Grid>
+                                            </Grid>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                </Grid>
+                <!-- minor details -->
+                <Grid Grid.Column="1" Grid.Row="0" VerticalAlignment="Top">
+                    <StackPanel Orientation="Vertical">
+                        <StackPanel Orientation="Horizontal">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Category" FontWeight="Bold" Margin="0,0,8,0"/>
+                                <TextBlock Text="{Binding Category.CategoryName,Mode=OneWay}" Width="150"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="20,0,0,0">
+                                <TextBlock Text="Level" FontWeight="Bold" Margin="0,0,8,0"/>
+                                <TextBlock Text="{Binding EntryLevel,Mode=OneWay}" Width="100"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="20,0,0,0">
+                                <TextBlock Text="File Attachment" FontWeight="Bold" Margin="0,0,8,0"/>
+                                <Button Style="{StaticResource FileAttachmentButtonStyle}" Tag="{Binding FileAttachment}" Click="OpenFileAttachment_btn_Click"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="20,0,0,0">
+                                <TextBlock Text="Youtube Link" FontWeight="Bold" Margin="0,0,8,0"/>
+                                <Button Style="{StaticResource YoutubeLinkButtonStyle}" Tag="{Binding YoutubeUrlLink}" Click="OpenYoutubeLink_btn_Click"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </StackPanel>
+                </Grid>
+                <!-- short description -->
+                <GroupBox Grid.Column="1" Grid.Row="1" Margin="0,20,0,20">
+                    <GroupBox.Header>
+                        <TextBlock Text="Short Description" FontWeight="Bold"/>
+                    </GroupBox.Header>
+                    <html:HtmlPreview DockPanel.Dock="Bottom" HtmlContent="{Binding ShortDescription}" BorderThickness="0"/>
+                </GroupBox>
+                <!-- long description -->
+                <GroupBox Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="2">
+                    <GroupBox.Header>
+                        <TextBlock Text="Long Description" FontWeight="Bold"/>
+                    </GroupBox.Header>
+                    <html:HtmlPreview DockPanel.Dock="Bottom" HtmlContent="{Binding LongDescription}" BorderThickness="0"/>
+                </GroupBox>
+            </Grid>
+        </GroupBox>
+    </Grid>
+</Page>

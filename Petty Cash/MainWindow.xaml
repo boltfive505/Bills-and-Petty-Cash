@@ -1,0 +1,77 @@
+﻿<Window x:Class="Petty_Cash.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Petty_Cash"
+        xmlns:modal="clr-namespace:bolt5.ModalWpf;assembly=bolt5.ModalWpf"
+        xmlns:pages="clr-namespace:Petty_Cash.Tab_Pages"
+        mc:Ignorable="d"
+        Title="Bills and Cash" Height="450" Width="800"
+        WindowState="Maximized" Icon="petty cash.ico"
+        TextOptions.TextFormattingMode="Display" TextOptions.TextRenderingMode="ClearType">
+    <Grid>
+        <TabControl x:Name="tabControl1" 
+                    pages:voucher_list_page.LiquidateVoucher="TabControl_LiquidateVoucher"
+                    pages:bill_calendar_page.SelectBill="tabControl1_SelectBill">
+            <TabItem Header="ADD BILLS" Padding="{StaticResource MainTab.Header.Padding}">
+                <Frame Margin="{StaticResource MainTab.Page.Margin}">
+                    <Frame.Content>
+                        <pages:bill_calendar_page/>
+                    </Frame.Content>
+                </Frame>
+            </TabItem>
+            <TabItem x:Name="billsPaymentTab" Header="PAY BILLS" Padding="{StaticResource MainTab.Header.Padding}">
+                <Frame Margin="{StaticResource MainTab.Page.Margin}">
+                    <Frame.Content>
+                        <pages:bill_payment_page x:Name="billsPaymentPage"/>
+                    </Frame.Content>
+                </Frame>
+            </TabItem>
+            <TabItem Header="VOUCHERS" Padding="{StaticResource MainTab.Header.Padding}">
+                <Frame Margin="{StaticResource MainTab.Page.Margin}">
+                    <Frame.Content>
+                        <pages:voucher_list_page/>
+                    </Frame.Content>
+                </Frame>
+            </TabItem>
+            <TabItem x:Name="pettyCashTab" Header="PETTY CASH" Padding="{StaticResource MainTab.Header.Padding}">
+                <Frame Margin="{StaticResource MainTab.Page.Margin}">
+                    <Frame.Content>
+                        <pages:transactions_page x:Name="pettyCashPage"/>
+                    </Frame.Content>
+                </Frame>
+            </TabItem>
+            <TabItem Header="ISSUE CHECK" Padding="{StaticResource MainTab.Header.Padding}">
+                <Frame Margin="{StaticResource MainTab.Page.Margin}">
+                    <Frame.Content>
+                        <pages:check_writer_page/>
+                    </Frame.Content>
+                </Frame>
+            </TabItem>
+            <TabItem Header="SETUP" Padding="{StaticResource MainTab.Header.Padding}">
+                <Frame Margin="{StaticResource MainTab.Page.Margin}">
+                    <Frame.Content>
+                        <pages:setup_page/>
+                    </Frame.Content>
+                </Frame>
+            </TabItem>
+            <TabItem Header="TUTORIALS" Padding="{StaticResource MainTab.Header.Padding}">
+                <Frame Margin="{StaticResource MainTab.Page.Margin}">
+                    <Frame.Content>
+                        <pages:tutorials/>
+                    </Frame.Content>
+                </Frame>
+            </TabItem>
+            <TabItem Header="CALENDAR" Padding="{StaticResource MainTab.Header.Padding}">
+                <Frame Margin="{StaticResource MainTab.Page.Margin}">
+                    <Frame.Content>
+                        <pages:tutorials_calendar/>
+                    </Frame.Content>
+                </Frame>
+            </TabItem>
+        </TabControl>
+
+        <modal:ModalForm Visibility="Hidden"/>
+    </Grid>
+</Window>

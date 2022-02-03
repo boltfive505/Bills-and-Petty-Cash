@@ -1,0 +1,24 @@
+﻿<UserControl x:Class="Petty_Cash.Sub_Modals.payeeAddEdit_modal"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Petty_Cash.Sub_Modals"
+             mc:Ignorable="d" >
+    <Grid Background="White">
+        <StackPanel Orientation="Vertical" Margin="{StaticResource SubModal.Group.Margin}">
+            <StackPanel Orientation="Horizontal">
+                <!-- payee name -->
+                <StackPanel Orientation="Vertical" Margin="{StaticResource SubModal.Fields.Margin}">
+                    <TextBlock Text="Payee Name"/>
+                    <TextBox x:Name="PayeeNameValue" Text="{Binding PayeeName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="200"/>
+                </StackPanel>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <StackPanel Orientation="Vertical" Margin="{StaticResource SubModal.Fields.Margin}">
+                    <CheckBox x:Name="IsActiveValue" Content="Is Active" IsChecked="{Binding IsActive}" Unchecked="IsActiveValue_Unchecked"/>
+                </StackPanel>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</UserControl>

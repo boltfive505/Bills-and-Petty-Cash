@@ -1,0 +1,344 @@
+﻿<Page x:Class="Petty_Cash.Tab_Pages.transactions_page"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:Petty_Cash.Tab_Pages"
+      xmlns:me="clr-namespace:Petty_Cash"
+      xmlns:system="clr-namespace:System;assembly=mscorlib"
+      xmlns:converters="clr-namespace:Petty_Cash.Converters"
+      xmlns:xceed="clr-namespace:Xceed.Wpf.Toolkit;assembly=Xceed.Wpf.Toolkit"
+      mc:Ignorable="d" 
+      Title="transactions_page" Loaded="Page_Loaded">
+    <Page.Resources>
+        <ObjectDataProvider x:Key="TransactionTypeData" MethodName="GetValues" ObjectType="{x:Type system:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="me:TransactionType"/>
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+        <converters:CurrencyDisplayConverter x:Key="DisplayNoCurrency" ShowCurrency="False" AllowZero="False"/>
+    </Page.Resources>
+    <Grid Background="White">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="150"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <!-- filters and buttons -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal" VerticalAlignment="Top" HorizontalAlignment="Left">
+            <!-- filters -->
+            <GroupBox x:Name="filtersGroup" Header="Filters" Margin="0,0,50,0">
+                <StackPanel Orientation="Vertical" Margin="{StaticResource Filters.GroupBox.Margin}">
+                    <StackPanel Orientation="Horizontal" Margin="{StaticResource Filters.Vertical.Margin}">
+                        <StackPanel Orientation="Vertical" Margin="{StaticResource Filters.Fields.Margin}">
+                            <TextBlock Text="Category"/>
+                            <ComboBox Width="120" MaxDropDownHeight="300" ItemsSource="{Binding CategoryList}"
+                                      SelectedValue="{Binding FilterCategory}" Validation.ErrorTemplate="{x:Null}"
+                                      DisplayMemberPath="CategoryName" SelectedValuePath="Id"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Vertical" Margin="{StaticResource Filters.Fields.Margin}">
+                            <TextBlock Text="Payee"/>
+                            <ComboBox Width="200" MaxDropDownHeight="300" ItemsSource="{Binding PayeeList}"
+                                      SelectedValue="{Binding FilterPayee}" Validation.ErrorTemplate="{x:Null}"
+                                      DisplayMemberPath="PayeeName" SelectedValuePath="Id"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Vertical" Margin="{StaticResource Filters.Fields.Margin}">
+                            <TextBlock Text="Voucher #"/>
+                            <TextBox Text="{Binding FilterVoucherNumber,UpdateSourceTrigger=PropertyChanged}" Width="80"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Vertical" Margin="{StaticResource Filters.Fields.Margin}">
+                            <TextBlock Text="Transaction"/>
+                            <ComboBox Width="120" ItemsSource="{Binding Source={StaticResource TransactionTypeData}}"
+                                      SelectedItem="{Binding FilterTransaction}"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Vertical" Margin="{StaticResource Filters.Fields.Margin}" VerticalAlignment="Bottom">
+                            <Button Content="Reset" Click="ResetFilters_btn_Click"/>
+                        </StackPanel>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="{StaticResource Filters.Vertical.Margin}">
+                        <StackPanel Orientation="Vertical" Margin="{StaticResource Filters.Fields.Margin}">
+                            <TextBlock Text="Date Range"/>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="from " VerticalAlignment="Center" Foreground="Gray"/>
+                                <xceed:DateTimePicker x:Name="filterDateFrom" Value="{Binding FilterDateFrom,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+                                                      ShowButtonSpinner="False" TimePickerVisibility="Collapsed" Format="ShortDate" Width="100" Margin="{StaticResource Filters.Subfields.Margin}"/>
+                                <TextBlock Text="to " VerticalAlignment="Center" Foreground="Gray"/>
+                                <xceed:DateTimePicker x:Name="filterDateTo" Value="{Binding FilterDateTo,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+                                                      ShowButtonSpinner="False" TimePickerVisibility="Collapsed" Format="ShortDate" Width="100" Margin="{StaticResource Filters.Subfields.Margin}"/>
+                                
+                                <Button Content="This Month" Style="{StaticResource LinkButton}" Click="ApplyDateRange_btn_Click"
+                                        Margin="5,0,0,0" Tag="{x:Static me:DateRangeType.ThisMonth}"/>
+                                <Button Content="Last Month" Style="{StaticResource LinkButton}"  Click="ApplyDateRange_btn_Click"
+                                        Margin="8,0,0,0" Tag="{x:Static me:DateRangeType.LastMonth}"/>
+                                <Button Content="Today" Style="{StaticResource LinkButton}"  Click="ApplyDateRange_btn_Click"
+                                        Margin="8,0,0,0" Tag="{x:Static me:DateRangeType.Today}"/>
+                                <!--<Button Content="Apply Date Range" Click="ApplyDateRange_btn_Click" Margin="8,0,0,0"/>-->
+                            </StackPanel>
+                        </StackPanel>
+                    </StackPanel>
+                </StackPanel>
+            </GroupBox>
+            <!-- buttons -->
+            <StackPanel Orientation="Vertical" Margin="0,10,0,0">
+                <UniformGrid Columns="1" Height="70" Margin="0,0,0,20">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Top">
+                        <Button Content="Add Admin Expense" Background="Salmon" Click="AddAdminExpense_Click"/>
+                        <TextBlock Style="{StaticResource QuestionTextIcon}" Margin="5,0,0,0">
+                            <TextBlock.ToolTip>
+                                <TextBlock FontSize="14" MaxWidth="500" TextWrapping="Wrap">
+                                Admin Expense is only for expense report to BIR. This expense does not need to Create Voucher. It does not need to be Liquidated. It simply record expense only.<LineBreak/>
+                                <Run Foreground="Red">It will not affect Petty Cash Balance.</Run>
+                                </TextBlock>
+                            </TextBlock.ToolTip>
+                    </TextBlock>
+                    </StackPanel>
+                    <Button Content="Export to Excel" Click="ExportExcel_btn_Click" FontWeight="Bold" Foreground="Purple" BorderBrush="Purple" VerticalAlignment="Center" Margin="0,0,21,0"/>
+                </UniformGrid>
+                <StackPanel x:Name="totalsGroup" Orientation="Vertical" VerticalAlignment="Bottom">
+                    <TextBlock>
+                        Total Expense: <Run Text="{Binding GrandTotalExpense,Mode=OneWay,Converter={StaticResource DisplayNoCurrency}}" FontWeight="Bold" Foreground="Red"/>
+                    </TextBlock>
+                    <TextBlock>
+                        <Run Text="Current Vault Balance:"/>
+                        <Run Text="{Binding BalanceTotalOnce,Mode=OneWay,Converter={StaticResource DisplayNoCurrencyAllowZero}}" FontWeight="Bold">
+                            <Run.Style>
+                                <Style TargetType="{x:Type Run}">
+                                    <Setter Property="Foreground" Value="Blue"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding BalanceTotalOnce,Converter={StaticResource NegativeToBoolConverter}}" Value="False">
+                                            <Setter Property="Foreground" Value="red"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Run.Style>
+                        </Run>
+                    </TextBlock>
+                </StackPanel>
+            </StackPanel>
+        </StackPanel>
+        <!-- voucher totals -->
+        <Grid x:Name="totalsGrid" Grid.Row="1">
+            <Button Grid.Column="5" Content="{Binding AdminExpenseTotal,Converter={StaticResource DisplayNoCurrency}}" Style="{StaticResource TotalsStyle}"/>
+            <Button Grid.Column="6" Content="{Binding ExpenseTotal,Converter={StaticResource DisplayNoCurrency}}" Style="{StaticResource TotalsStyle}"/>
+            <Button Grid.Column="7" Content="{Binding ReturnTotal, Converter={StaticResource DisplayNoCurrency}}" Style="{StaticResource TotalsStyle}"/>
+            <!--<Button Grid.Column="8" Style="{StaticResource TotalsStyle}">
+                <TextBlock>
+                    <Run Text="Current Vault Balance:" FontWeight="Normal" Foreground="Gray"/>
+                    <Run Text="{Binding BalanceTotal,Mode=OneWay,Converter={StaticResource DisplayNoCurrency}}">
+                        <Run.Style>
+                            <Style TargetType="{x:Type Run}">
+                                <Setter Property="Foreground" Value="Blue"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding BalanceTotal,Converter={StaticResource NegativeToBoolConverter}}" Value="False">
+                                        <Setter Property="Foreground" Value="red"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Run.Style>
+                    </Run>
+                </TextBlock>
+            </Button>-->
+            <Button Grid.Column="13" Content="{Binding VatTotal,Converter={StaticResource DisplayNoCurrency}}" Style="{StaticResource TotalsStyle}"/>
+            <Button Grid.Column="14" Content="{Binding NetVatTotal,Converter={StaticResource DisplayNoCurrency}}" Style="{StaticResource TotalsStyle}"/>
+            <Button Grid.Column="15" Content="{Binding NonVatTotal,Converter={StaticResource DisplayNoCurrency}}" Style="{StaticResource TotalsStyle}"/>
+        </Grid>
+        <!-- transaction list -->
+        <DataGrid x:Name="pettyDg" Grid.Row="2">
+            <DataGrid.Columns>
+                <DataGridTemplateColumn>
+                    <DataGridTemplateColumn.CellStyle>
+                        <Style TargetType="{x:Type DataGridCell}" BasedOn="{StaticResource DataGridCell.Style.Default}">
+                            <Setter Property="Visibility" Value="Hidden"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType={x:Type DataGridRow}},Path=IsMouseOver}" Value="True">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </DataGridTemplateColumn.CellStyle>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button FontFamily="{StaticResource fontawesome-solid}" Content="{StaticResource fa-pen}"
+                                    Style="{StaticResource BorderlessButton}" Click="EditTransaction_btn_Click"
+                                    Foreground="Navy" ToolTip="Edit transaction"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Header="Voucher No." Binding="{Binding Voucher.VoucherNumber}" Width="80" HeaderStyle="{StaticResource DataGridColumnHeader.Right}">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Right}">
+                            <Setter Property="Visibility" Value="Visible"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsAdminExpense}" Value="True">
+                                    <Setter Property="Visibility" Value="Hidden"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <DataGridTextColumn Header="Date" Binding="{Binding TransactionDate, StringFormat=d}" Width="80">
+                    <DataGridTextColumn.HeaderStyle>
+                        <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource DataGridColumnHeader.Right}"/>
+                    </DataGridTextColumn.HeaderStyle>
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Right}">
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <DataGridTextColumn Header="Category" Binding="{Binding Category.CategoryName}" Width="100">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Left}">
+                            <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <DataGridTextColumn Header="Payee" Binding="{Binding Payee.PayeeName}" Width="150">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Left}">
+                            <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <!-- admin payee -->
+                <DataGridTextColumn Header="Admin Expense" Binding="{Binding AmountOut, Converter={StaticResource DisplayNoCurrency}}" Width="100">
+                    <DataGridTextColumn.HeaderStyle>
+                        <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource DataGridColumnHeader.Right}">
+                            <Setter Property="Background" Value="Salmon"/>
+                        </Style>
+                    </DataGridTextColumn.HeaderStyle>
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Right}">
+                            <Setter Property="Foreground" Value="DarkRed"/>
+                            <Setter Property="FontWeight" Value="Bold"/>
+                            <Setter Property="Visibility" Value="Hidden"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Payee.Id}" Value="-2">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <DataGridTextColumn Header="Cash-Out" Binding="{Binding AmountOut, Converter={StaticResource DisplayNoCurrency}}" Width="80">
+                    <DataGridTextColumn.HeaderStyle>
+                        <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource DataGridColumnHeader.Right}">
+                            <Setter Property="Background" Value="Salmon"/>
+                        </Style>
+                    </DataGridTextColumn.HeaderStyle>
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Right}">
+                            <Setter Property="Foreground" Value="DarkRed"/>
+                            <Setter Property="FontWeight" Value="Bold"/>
+                            <Setter Property="Visibility" Value="Visible"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Payee.Id}" Value="-2">
+                                    <Setter Property="Visibility" Value="Hidden"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <DataGridTextColumn Header="Cash-Return" Binding="{Binding AmountReturn, Converter={StaticResource DisplayNoCurrency}}" Width="80">
+                    <DataGridTextColumn.HeaderStyle>
+                        <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource DataGridColumnHeader.Right}">
+                            <Setter Property="Background" Value="SkyBlue"/>
+                        </Style>
+                    </DataGridTextColumn.HeaderStyle>
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Right}">
+                            <Setter Property="Foreground" Value="DarkBlue"/>
+                            <Setter Property="FontWeight" Value="Bold"/>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <DataGridTextColumn Header="Purpose ( Particulars )" Binding="{Binding Purpose}" Width="230">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Left}">
+                            <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <DataGridTemplateColumn Header="File">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button FontFamily="{StaticResource fontawesome-solid}" Content="{StaticResource fa-file}" Click="OpenPaymentFile_btn_Click" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="#f4c43b" ToolTip="{Binding PaymentFile}">
+                                <Button.Style>
+                                    <Style TargetType="{x:Type Button}" BasedOn="{StaticResource BorderlessButton}">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding PaymentFile}" Value="{x:Null}">
+                                                <Setter Property="Visibility" Value="Hidden"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding PaymentFile}" Value="">
+                                                <Setter Property="Visibility" Value="Hidden"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                            </Button>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Header="Tin No." Binding="{Binding Company.TinNumber, Converter={StaticResource TinNumberDisplayConverter}}" Width="120">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Left}">
+                            <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <DataGridTemplateColumn Header="Company" Width="150">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock TextTrimming="CharacterEllipsis" Margin="{StaticResource DataGridTextCell.Margin}">
+                                <Run Text="{Binding Company.CompanyName}"/>
+                                <Run Text="{Binding Company.Address,StringFormat={}- {0}}" Foreground="Gray" FontStyle="Italic"/>
+                            </TextBlock>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridCheckBoxColumn Header="VAT" Binding="{Binding IsVat}">
+                    <DataGridCheckBoxColumn.HeaderStyle>
+                        <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource DataGridColumnHeader.Center}"/>
+                    </DataGridCheckBoxColumn.HeaderStyle>
+                    <DataGridCheckBoxColumn.ElementStyle>
+                        <Style TargetType="{x:Type CheckBox}">
+                            <Setter Property="VerticalAlignment" Value="Center"/>
+                            <Setter Property="HorizontalAlignment" Value="Center"/>
+                            <Setter Property="IsHitTestVisible" Value="False"/>
+                        </Style>
+                    </DataGridCheckBoxColumn.ElementStyle>
+                </DataGridCheckBoxColumn>
+                <DataGridTextColumn Header="VAT (12%)" Binding="{Binding VatAmount, Converter={StaticResource DisplayNoCurrency}}" Width="80">
+                    <DataGridTextColumn.HeaderStyle>
+                        <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource DataGridColumnHeader.Right}">
+                        </Style>
+                    </DataGridTextColumn.HeaderStyle>
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Right}">
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <DataGridTextColumn Header="Net of VAT" Binding="{Binding NetVatAmount, Converter={StaticResource DisplayNoCurrency}}" Width="80">
+                    <DataGridTextColumn.HeaderStyle>
+                        <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource DataGridColumnHeader.Right}">
+                        </Style>
+                    </DataGridTextColumn.HeaderStyle>
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Right}">
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <DataGridTextColumn Header="Non-VAT" Binding="{Binding NonVatAmount, Converter={StaticResource DisplayNoCurrency}}" Width="80">
+                    <DataGridTextColumn.HeaderStyle>
+                        <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource DataGridColumnHeader.Right}">
+                        </Style>
+                    </DataGridTextColumn.HeaderStyle>
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Right}">
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</Page>
